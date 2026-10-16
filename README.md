@@ -11,7 +11,9 @@ npm ci
 npm run dev
 ```
 
-Open http://localhost:3000. Home contains the full reference layout and interactive 3D studio. `/marketplace` shows the sourced 44-variant Toyota catalogue with URL filters and sorting. The unlinked `/studio` route provides a scratch preview. Vehicle, budget, comparison, garage, listing, account and static pages are scheduled for later phases and currently show the shared 404 page.
+Open http://localhost:3000. Home contains the full reference layout and interactive 3D studio. `/marketplace` shows the sourced 44-variant Toyota catalogue with URL filters and sorting. Every catalogue vehicle has a `/vehicles/[id]` page, `/affordability` provides the five-slider calculator, and `/compare` supports URL-based selections. The unlinked `/studio` route provides a scratch preview. Garage, listing, account and static pages are scheduled for later phases and currently show the shared 404 page.
+
+Vercel uses the checked-in `vercel.json` commands (`npm ci`, then `npm run build`) so deployments use the repository's npm lockfile even when project settings contain an older package-manager override.
 
 ## Phase 1 scope
 
@@ -46,6 +48,14 @@ The noindex `/studio` scratch page accepts `body=hatch|suv|mpv`, a URL-encoded s
 
 The catalogue is a dated manufacturer reference, not live seller stock. Used inventory remains the reference's honest empty state. No auth, listings service, API or database has been imported. The three procedural body shapes and paint remain illustrative; sourced body styles and consumption are retained separately for subsequent pages.
 
+## Phase 4 scope
+
+- All 44 vehicle pages are prerendered with their sourced name/price, matching illustrative studio, 1/3/5-year estimates, saved-car toggle and links to Compare/Adjust budget. Unknown vehicle IDs return HTTP 404. New saves use canonical catalogue IDs; existing artifact aliases remain readable/removable.
+- `/affordability?id=...` preselects any catalogue car or featured alias. Five labelled sliders update the monthly total, four-segment bar, component costs and 1/3/5-year totals immediately. Selecting another car retains the slider settings, matching the reference. Financial inputs remain local to the page.
+- `/compare?a=...&b=...` accepts canonical IDs and featured aliases. Both selects write canonical IDs to the query string; reload and browser history restore selection. The three monetary rows highlight the lower value and expose it to assistive technology. Equal values have no highlight. Body styles use actual catalogue metadata.
+- Reused the supplied `fin`, `run` and `total` without changing their formulas or defaults. A warning identifies the petrol planning model whenever a diesel/hybrid is selected. [COST-ASSUMPTIONS.md](COST-ASSUMPTIONS.md) records the differences from the original site's financial model and what must be decided before launch; the handoff's assumptions have not been validated as current quotations.
+- Save changes keep scroll position. Navigating from a vehicle to its calculator/comparison disposes the old renderer, releases the WebGL context and stops animation/resize observation in the same document.
+
 ## Check the foundation
 
 ```sh
@@ -65,6 +75,8 @@ npm run check:studio
 node scripts/parity.mjs --studio
 npm run check:marketplace
 node scripts/parity.mjs --marketplace
+npm run check:ownership
+node scripts/parity.mjs --ownership
 ```
 
 If using an existing Chromium installation, prefix browser commands with `CHROMIUM_PATH=/path/to/chromium`.
@@ -81,6 +93,10 @@ The shell parity mode captures Header and Footer from Home and the not-found scr
 
 For a targeted recapture, add `--only=home` (or another case name from the script); this writes a separate case report. `--marketplace --compare-only` compares the existing 40 PNG pairs without refreshing them, useful after retaking a failed capture against the same app build.
 
+`check:ownership` verifies all 44 vehicle routes and all calculator prices against the original artifact's numeric functions, slider endpoints/keyboard use, finance term caps, preselection, save persistence/aliases, URL history and comparison ties, same-document viewer cleanup, seven responsive widths, and unexpected console/HTTP errors. Reports and screenshots go to `parity/ownership-checks.json` and `parity/checks/`.
+
+`parity --ownership` compares ten vehicle/calculator/comparison states at both sizes/themes (40 comparisons). Its reference runtime uses the same catalogue rows, actual body-style text and disclosed energy-model warning as the app. Production code, the supplied formulas/CSS and the reference file are unchanged by QA. This aligns content for layout comparison; the additions and source-model differences are documented in [PHASE4.md](PHASE4.md). Targeted `--only=...` and existing-image `--compare-only` checks also work in this mode.
+
 ```sh
 node scripts/parity.mjs [http://localhost:3000]
 ```
@@ -89,12 +105,11 @@ The original full-route capture mode remains available for later phases. Browser
 
 ## Continue the redesign
 
-The completed checks and their scope are recorded in [PHASE1.md](PHASE1.md), [PHASE2.md](PHASE2.md) and [PHASE3.md](PHASE3.md).
+The completed checks and their scope are recorded in [PHASE1.md](PHASE1.md), [PHASE2.md](PHASE2.md), [PHASE3.md](PHASE3.md) and [PHASE4.md](PHASE4.md).
 
 Read [AGENTS.md](AGENTS.md), [HANDOFF.md](HANDOFF.md), and [PROMPTS.md](PROMPTS.md). The visual source of truth is [reference/carpur-artifact.html](reference/carpur-artifact.html).
 
-1. Phase 4: implement Vehicle, Affordability, and Compare using the full catalogue; reconcile all cost assumptions with the original app's Sources page.
-2. Phase 5: implement Garage, real Sell and Sign-in flows, Sources, and Privacy. A backend/auth choice or import is required for the real flows.
-3. Phase 6: complete full-route parity and the acceptance checklist. Production OG metadata and analytics also remain to be supplied.
+1. Phase 5: implement Garage, real Sell and Sign-in flows, Sources, and Privacy. A backend/auth choice or import is required for the real flows.
+2. Phase 6: complete full-route parity and the acceptance checklist. Production OG metadata and analytics also remain to be supplied. Decide the launch financial model using [COST-ASSUMPTIONS.md](COST-ASSUMPTIONS.md).
 
-No deployment or remote Git changes are required to review this local foundation.
+The completed Phases 1–3 foundation was published to GitHub `main` at `6f0ef68`; Phase 4 continues on a separate branch. Deployment remains separate from these implementation phases.

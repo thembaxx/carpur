@@ -13,6 +13,7 @@ export const referenceCars = snapshot.map((row) => {
     t: /manual/i.test(row.transmission) ? "Manual" : "Automatic",
     f: /plug-in/i.test(row.fuelType) ? "Plug-in Hybrid" : /hybrid/i.test(row.fuelType) ? "Hybrid" : /diesel/i.test(row.fuelType) ? "Diesel" : "Petrol",
     b: row.bodyType === "suv" ? "suv" : row.bodyType === "mini-van-taxi" ? "mpv" : "hatch",
+    bodyStyle: ({ hatch: "Hatchback", suv: "SUV", sedan: "Sedan", coupe: "Coupe", "mini-van-taxi": "MPV" })[row.bodyType] || "Other",
     c: paints[range] || "#c8ccd2",
   };
 }).sort((a, b) => a.p - b.p);
