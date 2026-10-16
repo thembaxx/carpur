@@ -13,7 +13,9 @@
     "parity:studio": "node scripts/parity.mjs --studio",
     "check:studio": "node scripts/check-studio.mjs",
     "parity:marketplace": "node scripts/parity.mjs --marketplace",
-    "check:marketplace": "node scripts/check-marketplace.mjs"
+    "check:marketplace": "node scripts/check-marketplace.mjs",
+    "parity:ownership": "node scripts/parity.mjs --ownership",
+    "check:ownership": "node scripts/check-ownership.mjs"
   },
   "dependencies": {
     "next": "16.4.2",

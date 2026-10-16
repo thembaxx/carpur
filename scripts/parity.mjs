@@ -13,13 +13,15 @@ import { PNG } from "pngjs";
 import { createServer } from "node:http";
 import { controlStudioFrames, studioClick, settleStudio, captureElement } from "./studio-browser.mjs";
 import { alignReferenceCatalogue } from "./catalogue-reference.mjs";
+import { alignOwnershipReference, adjustedInputs, setRange } from "./ownership-reference.mjs";
 
 const shellOnly = process.argv.includes("--shell");
 const studioOnly = process.argv.includes("--studio");
 const marketplaceOnly = process.argv.includes("--marketplace");
+const ownershipOnly = process.argv.includes("--ownership");
 const onlyName = process.argv.find((arg) => arg.startsWith("--only="))?.slice(7);
 const compareOnly = process.argv.includes("--compare-only");
-if (compareOnly && !marketplaceOnly) throw new Error("--compare-only currently requires --marketplace");
+if (compareOnly && !marketplaceOnly && !ownershipOnly) throw new Error("--compare-only requires --marketplace or --ownership");
 const APP = process.argv.slice(2).find((arg) => !arg.startsWith("--")) || "http://localhost:3000";
 const referenceFile = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../reference/carpur-artifact.html");
 // Serve the unchanged artifact over HTTP; managed browsers may block file:// navigation.
@@ -56,18 +58,29 @@ const marketplacePairs = [
   PAIRS[2],
   ["used-hybrid", "#/cars?c=used&f=Hybrid", "/marketplace?inventory=sellers&condition=USED&fuel=Hybrid"],
 ];
-const pairs = (marketplaceOnly ? marketplacePairs : studioOnly ? [PAIRS[0]] : shellOnly ? [PAIRS[0], ["not-found", "#/phase-1-shell", "/phase-1-shell"]] : PAIRS).filter(([name]) => !onlyName || name === onlyName);
+const ownershipPairs = [
+  ...[["starlet", "1616"], ["rumion", "1743"], ["urban", "1611"]].map(([name, id]) => [`vehicle-${name}`, `#/car/catalogue-toyota-${id}`, `/vehicles/catalogue-toyota-${id}`]),
+  ["vehicle-missing", "#/car/missing", "/vehicles/missing"],
+  ["affordability", "#/afford", "/affordability"],
+  ["affordability-cross", "#/afford?id=catalogue-toyota-1919", "/affordability?id=catalogue-toyota-1919"],
+  ["affordability-adjusted", "#/afford?id=catalogue-toyota-1914", "/affordability?id=catalogue-toyota-1914"],
+  ["compare", "#/compare", "/compare"],
+  ["compare-reversed", "#/compare?a=catalogue-toyota-1919&b=catalogue-toyota-1616", "/compare?a=catalogue-toyota-1919&b=catalogue-toyota-1616"],
+  ["compare-equal", "#/compare?a=catalogue-toyota-1914&b=catalogue-toyota-1914", "/compare?a=catalogue-toyota-1914&b=catalogue-toyota-1914"],
+];
+const mode = ownershipOnly ? "ownership" : marketplaceOnly ? "marketplace" : studioOnly ? "studio" : "shell";
+const pairs = (ownershipOnly ? ownershipPairs : marketplaceOnly ? marketplacePairs : studioOnly ? [PAIRS[0]] : shellOnly ? [PAIRS[0], ["not-found", "#/phase-1-shell", "/phase-1-shell"]] : PAIRS).filter(([name]) => !onlyName || name === onlyName);
 const filenames = new Set();
 
 try {
 if (!pairs.length) throw new Error(`Unknown comparison case: ${onlyName}`);
 for (const vp of VIEWPORTS) for (const scheme of SCHEMES) {
   if (compareOnly) {
-    for (const [name] of pairs) filenames.add(`marketplace-${name}-${vp.w}-${scheme}.png`);
+    for (const [name] of pairs) filenames.add(`${mode}-${name}-${vp.w}-${scheme}.png`);
     continue;
   }
   const ctx = await browser.newContext({ viewport: { width: vp.w, height: vp.h }, colorScheme: scheme, reducedMotion: "reduce" });
-  if (studioOnly || marketplaceOnly) await controlStudioFrames(ctx);
+  if (studioOnly || marketplaceOnly || ownershipOnly) await controlStudioFrames(ctx);
   // Layout comparisons use the supplied silhouette fallback on both sides.
   // Healthy manufacturer photos are verified separately by check-marketplace.
   if (marketplaceOnly) await ctx.route("**/_next/image?*", (route) => route.fulfill({ status: 200, contentType: "image/png", body: "intentional invalid image for fallback parity" }));
@@ -76,6 +89,24 @@ for (const vp of VIEWPORTS) for (const scheme of SCHEMES) {
     await page.goto(side === "ref" ? REF + hash : APP + route, { waitUntil: "domcontentloaded" });
     await page.locator("footer .fc.on").first().waitFor();
     await page.evaluate(() => document.fonts.ready);
+    if (ownershipOnly) {
+      const adjusted = name === "affordability-adjusted";
+      if (side === "ref") await alignOwnershipReference(page, adjusted);
+      else if (adjusted) for (const [key, value] of Object.entries(adjustedInputs)) await setRange(page, key, value);
+      if (name.startsWith("vehicle-") && name !== "vehicle-missing") {
+        await page.locator('.stage [data-v="Side"]').waitFor({ state: "attached" });
+        await studioClick(page, '[data-v="Side"]');
+        await settleStudio(page);
+      }
+      if (side === "app" && ["/affordability", "/compare"].includes(route)) await page.locator('nav a[aria-current="page"]').waitFor();
+      await page.evaluate(async () => { scrollTo(0, 0); await window.presentStudioFrame(); });
+      const filename = `ownership-${name}-${vp.w}-${scheme}.png`;
+      await page.screenshot({ path: `parity/${side}/${filename}`, fullPage: true });
+      filenames.add(filename);
+      console.log(`Captured ${filename} (${side})`);
+      await page.close();
+      continue;
+    }
     if (marketplaceOnly) {
       if (side === "ref") await alignReferenceCatalogue(page, name === "home");
       else {
@@ -166,7 +197,7 @@ for (const vp of VIEWPORTS) for (const scheme of SCHEMES) {
   await new Promise((resolve) => referenceServer.close(resolve));
 }
 
-if (shellOnly || studioOnly || marketplaceOnly) {
+if (shellOnly || studioOnly || marketplaceOnly || ownershipOnly) {
   const results = [...filenames].map((filename) => {
     const ref = PNG.sync.read(readFileSync(`parity/ref/${filename}`));
     const app = PNG.sync.read(readFileSync(`parity/app/${filename}`));
@@ -178,7 +209,7 @@ if (shellOnly || studioOnly || marketplaceOnly) {
     writeFileSync(`parity/diff/${filename}`, PNG.sync.write(diff));
     return { filename, pass: pixels === 0, pixels, percent: +(pixels / (ref.width * ref.height) * 100).toFixed(4) };
   });
-  writeFileSync(`parity/${marketplaceOnly ? "marketplace" : studioOnly ? "studio" : "shell"}${onlyName ? `-${onlyName}` : ""}-results.json`, JSON.stringify(results, null, 2) + "\n");
+  writeFileSync(`parity/${mode}${onlyName ? `-${onlyName}` : ""}-results.json`, JSON.stringify(results, null, 2) + "\n");
   for (const result of results) console.log(`${result.pass ? "PASS" : "FAIL"} ${result.filename}: ${result.reason || `${result.pixels} differing pixels (${result.percent}%)`}`);
   if (results.some((result) => !result.pass)) process.exitCode = 1;
 } else {
