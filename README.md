@@ -13,6 +13,8 @@ npm run dev
 
 Open http://localhost:3000. Home contains the full reference layout and interactive 3D studio. `/marketplace` shows the sourced 44-variant Toyota catalogue with URL filters and sorting. Every catalogue vehicle has a `/vehicles/[id]` page, `/affordability` provides the five-slider calculator, and `/compare` supports URL-based selections. The unlinked `/studio` route provides a scratch preview. Garage, listing, account and static pages are scheduled for later phases and currently show the shared 404 page.
 
+Vercel uses the checked-in `vercel.json` commands (`npm ci`, then `npm run build`) so deployments use the repository's npm lockfile even when project settings contain an older package-manager override.
+
 ## Phase 1 scope
 
 - Sora through `next/font`, the original design tokens/CSS, safe-area viewport settings, and the no-flash theme script.
