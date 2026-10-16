@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/thembaxx/nou2",
+  "commit": "3a1c777242f6536cf4b53de6a259d70d2bb5fc8b",
+  "path": "data/toyota-2026-10-13.json",
+  "observedAt": "2026-10-13",
+  "importedAt": "2026-10-16",
+  "variants": 44,
+  "ranges": 10,
+  "priceBasis": "Manufacturer reference; not seller inventory or a current offer"
+}

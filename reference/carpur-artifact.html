@@ -1,0 +1,173 @@
+<!DOCTYPE html><html lang="en-ZA"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Carpur — Find your next car</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f1ec;--fg:#14161a;--mut:#666b73;--card:#fff;--ln:rgba(0,0,0,.1);--ac:#e8502a;--hd:rgba(243,241,236,.86);color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#090b0e;--fg:#f2f0ea;--mut:#8b9098;--card:#12151a;--ln:rgba(255,255,255,.1);--ac:#ff6a3d;--hd:rgba(9,11,14,.86);color-scheme:dark}}
+:root[data-theme=dark]{--bg:#090b0e;--fg:#f2f0ea;--mut:#8b9098;--card:#12151a;--ln:rgba(255,255,255,.1);--ac:#ff6a3d;--hd:rgba(9,11,14,.86);color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--fg);font:400 16px/1.5 Sora,system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--hd);backdrop-filter:blur(12px)}
+a{color:inherit;text-decoration:none}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:11;background:var(--hd);backdrop-filter:blur(12px);border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:12px;padding:10px 20px;flex-wrap:wrap}
+.logo{font-weight:700;font-size:20px;letter-spacing:-.03em;margin-right:auto}.logo i{color:var(--ac);font-style:normal}
+nav{display:flex;gap:4px;overflow-x:auto;width:100%;order:3}
+@media(min-width:900px){nav{order:0;width:auto;margin-right:auto}.logo{margin-right:0}}
+nav a{padding:6px 12px;border-radius:99px;font-size:14px;color:var(--mut);white-space:nowrap}nav a.on{background:var(--fg);color:var(--bg)}
+.btn{display:inline-block;padding:11px 20px;border-radius:99px;background:var(--fg);color:var(--bg);font:600 14px Sora,sans-serif;border:0;cursor:pointer}
+.btn.ac{background:var(--ac);color:#fff}.btn.o{background:none;color:var(--fg);border:1px solid var(--ln)}
+main{max-width:1180px;margin:auto;padding:0 20px 40px}
+h1{font-size:clamp(42px,9vw,92px);line-height:.98;letter-spacing:-.045em}h2{font-size:clamp(28px,4.5vw,46px);line-height:1.05;letter-spacing:-.03em}
+.k{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);font-weight:600}.mut{color:var(--mut)}
+.hero{display:grid;gap:24px;padding:32px 0;align-items:center}@media(min-width:900px){.hero{grid-template-columns:1fr 1.3fr}}
+.sec{padding:48px 0}.sec>.mut{margin:8px 0 24px}
+.stage{position:relative;height:min(70vw,540px);min-height:380px;border-radius:28px;background:radial-gradient(120% 90% at 50% 100%,#2b3342,#0b0d11);overflow:hidden;touch-action:pan-y;cursor:grab;color:#fff}
+.stage canvas{display:block;width:100%;height:100%}.stage svg{padding:40px}
+.hint{position:absolute;top:14px;left:18px;font-size:12px;opacity:.6}
+.ctl{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{padding:6px 12px;border-radius:99px;font:600 12px Sora,sans-serif;background:rgba(255,255,255,.14);color:#fff;border:0;cursor:pointer;backdrop-filter:blur(8px)}.chip.on{background:#fff;color:#000}
+.sw{width:22px;height:22px;border-radius:50%;border:2px solid rgba(255,255,255,.55);cursor:pointer;padding:0}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:22px;padding:18px;display:flex;flex-direction:column;gap:6px;transition:transform .25s,border-color .25s}a.card:hover{transform:translateY(-4px);border-color:var(--ac)}
+.card svg{width:100%;height:auto;margin-bottom:6px}
+.fc{padding:7px 14px;border-radius:99px;border:1px solid var(--ln);background:none;color:var(--fg);font:600 13px Sora,sans-serif;cursor:pointer;display:inline-block}.fc.on{background:var(--fg);color:var(--bg)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--ln);background:var(--card);color:var(--fg);font:inherit}input[type=range]{padding:0;accent-color:var(--ac)}
+label{font-size:13px;color:var(--mut);display:block;margin:14px 0 4px}
+.bar{display:flex;height:14px;border-radius:9px;overflow:hidden;gap:2px}.bar i{display:block}
+.ln{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--ln)}
+table{width:100%;border-collapse:collapse}td,th{padding:12px 8px;border-bottom:1px solid var(--ln);text-align:left}.w{color:var(--ac);font-weight:700}
+.empty{border:1px dashed var(--ln);border-radius:22px;padding:36px;text-align:center}
+.rv{opacity:0;transform:translateY(18px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){.rv{opacity:1;transform:none;transition:none}}
+footer{max-width:1180px;margin:auto;padding:32px 20px 48px;border-top:1px solid var(--ln);font-size:13px;color:var(--mut)}
+footer .row{align-items:center;margin:10px 0}footer .fc{font-size:12px}
+</style></head><body>
+<header><a class="logo" href="#/">Carpur<i>.</i></a><nav id="nv"></nav><a class="btn o" href="#/sign-in">Sign in</a><a class="btn ac" href="#/sell">Sell</a></header>
+<main id="m"></main>
+<footer><b style="color:var(--fg)">Carpur.</b> Beyond the price tag. Built for South Africa.
+<div class="row">Appearance <button class="fc" data-th="auto">Device</button><button class="fc" data-th="light">Light</button><button class="fc" data-th="dark">Dark</button></div>
+<div class="row">3D quality <button class="fc" data-q="auto">Automatic</button><button class="fc" data-q="save">Save battery</button><button class="fc" data-q="high">High detail</button></div>
+<p>Reference prices are manufacturer figures observed 13 October 2026; confirm with a dealer. Cost figures are estimates, not finance or insurance offers. 3D cars are procedural illustrations, not scans of a specific vehicle.</p></footer>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $=s=>document.querySelector(s),M=$('#m');
+const ld=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v==null?d:v}catch(e){return d}},sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
+const S={saved:ld('cp.s',[]),th:ld('cp.t','auto'),q:ld('cp.q','auto')};
+const R=n=>'R '+Math.round(n).toLocaleString('en-ZA');
+const CARS=[
+{id:'starlet',n:'Toyota Starlet 1.5L Xi 5MT',p:273700,t:'Manual',b:'hatch',f:'Petrol',c:'#c8ccd2'},
+{id:'rumion',n:'Toyota Rumion 1.5 S MT',p:314100,t:'Manual',b:'mpv',f:'Petrol',c:'#6c7a89'},
+{id:'urban',n:'Toyota Urban Cruiser 1.5 Xs MT',p:342700,t:'Manual',b:'suv',f:'Petrol',c:'#b3422e'},
+{id:'cross',n:'Toyota Corolla Cross 1.8 Xi',p:429100,t:'Automatic',b:'suv',f:'Petrol',c:'#2d4a63'}];
+const car=id=>CARS.find(c=>c.id===id);
+const fin=(p,dep=10,n=60,rate=12.5)=>{const P=p*(1-dep/100),r=rate/1200;return P*r/(1-Math.pow(1+r,-n))};
+const run=(p,km=1500,L=6.5,fp=24)=>({fuel:km*L/100*fp,ins:p*.05/12,mnt:p*.015/12});
+const sum=o=>o.fuel+o.ins+o.mnt;
+const total=(p,y,o={})=>{const{dep=10,n=60,rate=12.5,km=1500,fp=24}=o,m=y*12;return p*dep/100+fin(p,dep,n,rate)*Math.min(m,n)+sum(run(p,km,6.5,fp))*m};
+const sil=(b,c)=>{const r={hatch:30,suv:22,mpv:20}[b]||26;return `<svg viewBox="0 0 300 120"><ellipse cx="150" cy="108" rx="120" ry="7" fill="#0003"/><path d="M18 92V74Q20 64 42 62L92 56Q112 ${r} 150 ${r}L205 ${r+2}Q228 ${r+8} 246 60L274 66Q286 70 286 92Z" fill="${c}"/><path d="M104 58Q118 ${r+8} 150 ${r+8}L200 ${r+10}Q220 ${r+14} 234 58Z" fill="#0008"/>${[78,226].map(x=>`<circle cx="${x}" cy="92" r="17" fill="#111"/><circle cx="${x}" cy="92" r="8" fill="#ccd"/>`).join('')}</svg>`};
+
+/* ---------- 3D: procedural car (extruded body, glasshouse, wheels, lamps) ---------- */
+function buildCar(col,b){
+ const g=new THREE.Group(),H={hatch:1.42,suv:1.58,mpv:1.62}[b]||1.5;
+ const paint=new THREE.MeshPhysicalMaterial({color:col,metalness:.55,roughness:.3,clearcoat:1,clearcoatRoughness:.04,envMapIntensity:1.2});
+ const glass=new THREE.MeshPhysicalMaterial({color:0x0a1119,metalness:.3,roughness:.05,clearcoat:1,envMapIntensity:1.6});
+ const dark=new THREE.MeshStandardMaterial({color:0x0b0c0e,roughness:.75}),chrome=new THREE.MeshStandardMaterial({color:0xdde1e6,metalness:1,roughness:.2});
+ const ex=(s,d,bt,bs)=>{const m=new THREE.ExtrudeGeometry(s,{depth:d,bevelEnabled:true,bevelThickness:bt,bevelSize:bs,bevelSegments:6,curveSegments:24});m.translate(0,0,-d/2);return m};
+ const add=(geo,mat,x,y,z)=>{const m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);g.add(m);return m};
+ const s=new THREE.Shape();s.moveTo(-2.05,.34);s.lineTo(2,.34);s.quadraticCurveTo(2.17,.36,2.17,.58);s.lineTo(2.15,.8);s.quadraticCurveTo(2.12,.93,1.85,.97);s.bezierCurveTo(1.2,1.02,.85,1.06,.6,1.1);s.lineTo(-1.6,1.1);s.quadraticCurveTo(-2.1,1.08,-2.14,.85);s.lineTo(-2.15,.58);s.quadraticCurveTo(-2.15,.34,-2.05,.34);
+ add(ex(s,1.4,.12,.07),paint,0,0,0);
+ const c=new THREE.Shape();c.moveTo(-1.75,1.08);c.bezierCurveTo(-1.65,H-.04,-1.35,H,-.95,H);c.lineTo(.1,H);c.bezierCurveTo(.42,H-.02,.55,1.3,.88,1.08);c.lineTo(-1.75,1.08);
+ add(ex(c,1.1,.1,.06),glass,0,0,0);
+ add(new THREE.BoxGeometry(1.1,.05,1.22),paint,-.42,H+.03,0);
+ add(new THREE.BoxGeometry(4.1,.2,1.4),dark,0,.3,0);
+ [1,-1].forEach(k=>{
+  add(new THREE.BoxGeometry(.08,H-1.08,.05),paint,-.55,(H+1.08)/2,k*.66);
+  add(new THREE.BoxGeometry(.12,.08,.17),paint,.58,1.14,k*.9);
+  [.35,-.6].forEach(x=>add(new THREE.BoxGeometry(.012,.5,.01),dark,x,.72,k*.826));
+  add(new THREE.BoxGeometry(.16,.025,.02),chrome,-.15,.93,k*.828);
+  const lm=(x,y,z,w,h,d,cl)=>add(new THREE.BoxGeometry(w,h,d),new THREE.MeshStandardMaterial({color:cl,emissive:cl,emissiveIntensity:1.5}),x,y,z);
+  lm(2.17,.84,k*.55,.05,.07,.36,0xffffff);lm(-2.16,.86,k*.6,.05,.08,.3,0xff2020);
+  const arch=new THREE.Mesh(new THREE.CircleGeometry(.43,40),new THREE.MeshBasicMaterial({color:0x050506}));arch.position.set(1.3,.35,k*.823);if(k<0)arch.rotation.y=Math.PI;g.add(arch);const a2=arch.clone();a2.position.x=-1.3;g.add(a2);
+  [1.3,-1.3].forEach(x=>{const w=new THREE.Group();
+   const tire=new THREE.Mesh(new THREE.TorusGeometry(.25,.1,16,40),new THREE.MeshStandardMaterial({color:0x111214,roughness:.9}));tire.scale.z=1.4;w.add(tire);
+   const rim=new THREE.Mesh(new THREE.CylinderGeometry(.2,.2,.2,32),chrome);rim.rotation.x=Math.PI/2;w.add(rim);
+   for(let i=0;i<5;i++){const sp=new THREE.Mesh(new THREE.BoxGeometry(.36,.05,.06),new THREE.MeshStandardMaterial({color:0x2b2f36,metalness:.8,roughness:.35}));sp.rotation.z=i*1.2566;sp.position.z=.11;w.add(sp)}
+   w.position.set(x,.35,k*.74);if(k<0)w.rotation.y=Math.PI;g.add(w)});
+ });
+ add(new THREE.BoxGeometry(.05,.14,.8),dark,2.19,.6,0);add(new THREE.BoxGeometry(.05,.05,1.1),chrome,2.19,.72,0);
+ g.userData.p=paint;return g}
+function studio(el,b,col,pick){
+ let r;try{r=new THREE.WebGLRenderer({antialias:true,alpha:true})}catch(e){el.innerHTML=sil(b,col);return}
+ r.setPixelRatio(Math.min(devicePixelRatio,S.q==='save'?1:S.q==='high'?2.5:2));r.toneMapping=THREE.ACESFilmicToneMapping;r.toneMappingExposure=1.15;r.outputEncoding=THREE.sRGBEncoding;
+ el.appendChild(r.domElement);
+ const sc=new THREE.Scene(),cam=new THREE.PerspectiveCamera(32,1,.1,60);
+ const e=document.createElement('canvas');e.width=1024;e.height=512;const x=e.getContext('2d'),gr=x.createLinearGradient(0,0,0,512);gr.addColorStop(0,'#3a4558');gr.addColorStop(.5,'#161a22');gr.addColorStop(1,'#050607');x.fillStyle=gr;x.fillRect(0,0,1024,512);x.fillStyle='#fff';[[80,60,260,40],[420,30,200,30],[700,70,280,44],[0,200,1024,6]].forEach(a=>x.fillRect(...a));
+ const et=new THREE.CanvasTexture(e);et.mapping=THREE.EquirectangularReflectionMapping;et.encoding=THREE.sRGBEncoding;
+ sc.environment=new THREE.PMREMGenerator(r).fromEquirectangular(et).texture;
+ const dl=new THREE.DirectionalLight(0xffffff,.7);dl.position.set(3,5,4);sc.add(dl);
+ const sh=document.createElement('canvas');sh.width=sh.height=256;const sx=sh.getContext('2d'),sg=sx.createRadialGradient(128,128,10,128,128,128);sg.addColorStop(0,'rgba(0,0,0,.8)');sg.addColorStop(1,'rgba(0,0,0,0)');sx.fillStyle=sg;sx.fillRect(0,0,256,256);
+ const gp=new THREE.Mesh(new THREE.PlaneGeometry(6.6,3.6),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(sh),transparent:true,depthWrite:false}));gp.rotation.x=-Math.PI/2;gp.position.y=.004;sc.add(gp);
+ let C,bt=b,cc=col;const mk=()=>{if(C)sc.remove(C);C=buildCar(cc,bt);sc.add(C)};mk();
+ let az=.8,el_=.15,tz=az,te=el_,auto=true,drag=0,lx=0,ly=0;
+ const V={'3/4':[.8,.15],Side:[0,.04],Front:[Math.PI/2,.1],Rear:[-Math.PI/2,.1]};
+ const cv=r.domElement;cv.onpointerdown=ev=>{drag=1;lx=ev.clientX;ly=ev.clientY;cv.setPointerCapture(ev.pointerId)};
+ cv.onpointermove=ev=>{if(!drag)return;tz-=(ev.clientX-lx)*.008;te=Math.min(.6,Math.max(.02,te+(ev.clientY-ly)*.004));lx=ev.clientX;ly=ev.clientY};
+ cv.onpointerup=cv.onpointercancel=()=>drag=0;
+ const ui=document.createElement('div');ui.className='ctl';
+ ui.innerHTML=Object.keys(V).map(k=>`<button class="chip" data-v="${k}">${k}</button>`).join('')+`<button class="chip on" data-a="1">Auto-rotate</button>`+['#c8ccd2','#b3422e','#2d4a63','#1f6f4a','#16191e'].map(c=>`<button class="sw" data-c="${c}" style="background:${c}" aria-label="Colour"></button>`).join('')+(pick?['hatch','suv','mpv'].map(k=>`<button class="chip" data-b="${k}">${k.toUpperCase()}</button>`).join(''):'');
+ ui.onclick=ev=>{const t=ev.target.closest('button');if(!t)return;const d=t.dataset;
+  if(d.v){const a=V[d.v];tz=a[0]+Math.round((tz-a[0])/(2*Math.PI))*2*Math.PI;te=a[1];auto=false;ui.querySelector('[data-a]').classList.remove('on')}
+  else if(d.a){auto=!auto;t.classList.toggle('on',auto)}else if(d.c){cc=d.c;C.userData.p.color.set(cc)}else if(d.b){bt=d.b;mk()}};
+ el.insertAdjacentHTML('beforeend','<span class="hint">Drag to orbit</span>');el.appendChild(ui);
+ const rs=()=>{const w=el.clientWidth,h=el.clientHeight;if(!w)return;r.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()};new ResizeObserver(rs).observe(el);rs();
+ const tick=()=>{if(!el.isConnected){r.dispose();return}requestAnimationFrame(tick);if(auto&&!drag)tz+=.004;az+=(tz-az)*.1;el_+=(te-el_)*.1;const d=Math.max(6.4,9.2/cam.aspect);cam.position.set(d*Math.sin(az)*Math.cos(el_),.55+d*Math.sin(el_),d*Math.cos(az)*Math.cos(el_));cam.lookAt(0,.45,0);r.render(sc,cam)};tick()}
+
+/* ---------- views ---------- */
+const card=c=>`<a class="card rv" href="#/car/${c.id}">${sil(c.b,c.c)}<span class="k">New · ${c.t}</span><b>${c.n}</b><span class="mut" style="font-size:13px">Manufacturer reference price</span><b style="font-size:22px">${R(c.p)}</b></a>`;
+const home=()=>[`<section class="hero"><div><p class="k">South Africa · Made for your next move</p><h1>Find your next car.</h1><p class="mut" style="margin:18px 0 26px;max-width:46ch">New cars and second-hand finds, with a clear view of what each one costs to own.</p><a class="btn ac" href="#/cars">Shop new cars</a> <a class="btn o" href="#/cars?c=used">Shop second hand</a></div><div class="stage" id="st"></div></section>
+<section class="sec"><p class="k rv">01 · A fresh start</p><h2 class="rv">Discover new cars.</h2><p class="mut rv">Featured from 44 manufacturer-published Toyota variants. Prices observed 13 October 2026.</p><div class="grid">${CARS.map(card).join('')}</div></section>
+<section class="sec"><p class="k rv">02 · A new chapter</p><h2 class="rv">Second hand. First choice.</h2><p class="mut rv">Compare mileage, condition and service history. Budget for an inspection and a repair reserve.</p><div class="empty rv"><b>Seller inventory is coming</b><p class="mut" style="margin:6px 0 16px">Explore the new-car catalogue while dealers and private sellers add stock.</p><a class="btn" href="#/sell">List a car</a></div></section>
+<section class="sec"><p class="k rv">03 · What moves you?</p><h2 class="rv">Explore the technology.</h2><div class="grid" style="margin-top:24px">${[['Petrol & Diesel','Familiar refuelling. Include servicing and fuel-price changes.','Petrol'],['Hybrid','Engine and motor together. Economy depends on your route.','Hybrid'],['Electric','Plan charging, range and battery cover with the price.','Electric'],['Plug-in Hybrid','Budget for petrol and charging.','Plug-in Hybrid']].map(t=>`<a class="card rv" href="#/cars?f=${encodeURIComponent(t[2])}"><b style="font-size:20px">${t[0]}</b><span class="mut">${t[1]}</span><span class="k" style="margin-top:10px">Explore cars →</span></a>`).join('')}</div></section>
+<section class="sec hero"><div><p class="k rv">04 · Buy with a clear view</p><h2 class="rv">A car you love. A budget that works.</h2><p class="mut rv" style="margin:12px 0 20px">The instalment is only the start. See finance, fuel, insurance and maintenance, then compare 1, 3 and 5 years of ownership.</p><a class="btn ac" href="#/afford">Check my budget</a> <a class="btn o" href="#/compare">Compare two cars</a></div><div class="card rv"><b>Before you buy</b>${['Get a written price including on-road fees.','Confirm stock, delivery date, warranty and service plan.','Compare lender terms, fees and balloon settlement.','Request an insurance quote; keep a repair reserve.','For used cars, check ownership and service history.'].map(x=>`<p class="ln mut" style="font-size:14px">${x}</p>`).join('')}</div></section>
+<section class="empty rv"><p class="k">For dealerships & private sellers</p><h2 style="margin:8px 0 16px">Find your next buyer.</h2><a class="btn ac" href="#/sell">Sell on Carpur</a></section>`,()=>studio($('#st'),'suv',CARS[2].c,true)];
+const cars=q=>{const c=q.get('c')||'new',f=q.get('f')||'All',s=q.get('s')||'a',u=p=>'#/cars?'+new URLSearchParams({c,f,s,...p});
+ const l=CARS.filter(x=>c==='new'&&(f==='All'||x.f===f)).sort((a,b)=>s==='a'?a.p-b.p:b.p-a.p);
+ return [`<section class="sec"><p class="k">Marketplace</p><h2>${c==='new'?'New cars':'Used cars'}</h2><div class="row">${['new','used'].map(x=>`<a class="fc ${c===x?'on':''}" href="${u({c:x})}">${x==='new'?'New':'Used'}</a>`).join('')}<span style="width:12px"></span>${['All','Petrol','Hybrid','Electric','Plug-in Hybrid'].map(x=>`<a class="fc ${f===x?'on':''}" href="${u({f:x})}">${x}</a>`).join('')}<span style="width:12px"></span><a class="fc" href="${u({s:s==='a'?'d':'a'})}">Price ${s==='a'?'low → high':'high → low'}</a></div>
+ ${l.length?`<div class="grid">${l.map(x=>card(x).replace('rv',''))}</div>`:`<div class="empty"><b>${c==='used'?'Seller inventory is coming':'No variants listed yet'}</b><p class="mut" style="margin:6px 0 16px">${c==='used'?'Dealerships and private sellers are adding stock.':'Try another fuel type or browse petrol cars.'}</p><a class="btn" href="${c==='used'?'#/sell':'#/cars'}">${c==='used'?'List a car':'Show all new cars'}</a></div>`}</section>`]};
+const detail=id=>{const c=car(id);if(!c)return nf();const sd=S.saved.includes(id);
+ return [`<section class="hero"><div class="stage" id="st"></div><div><p class="k">New · ${c.t} · ${c.f}</p><h2 style="margin:6px 0 10px">${c.n}</h2><p class="mut">Manufacturer reference price</p><h1 style="font-size:clamp(34px,6vw,56px)">${R(c.p)}</h1>
+ <div class="card" style="margin:20px 0"><b>Cost of ownership (estimate)</b>${[1,3,5].map(y=>`<p class="ln"><span class="mut">${y}-year total</span><b>${R(total(c.p,y))}</b></p>`).join('')}<p class="mut" style="font-size:12px">10% deposit, 60 months at 12.5%, 1 500 km a month.</p></div>
+ <div class="row"><button class="btn ${sd?'o':'ac'}" data-save="${id}">${sd?'Saved to garage ✓':'Save to garage'}</button><a class="btn o" href="#/compare?a=${id}">Compare</a><a class="btn o" href="#/afford?id=${id}">Adjust budget</a></div><p class="mut" style="font-size:12px">3D model is an illustrative ${c.b} body style, not this exact variant. Confirm stock and delivery with a dealer.</p></div></section>`,()=>studio($('#st'),c.b,c.c,false)]};
+const afford=q=>{const pre=car(q.get('id'))||CARS[0];
+ return [`<section class="sec"><p class="k">Affordability</p><h2>A car you love. A budget that works.</h2><div class="hero" style="align-items:start"><div class="card" id="af"><label>Car</label><select id="p">${CARS.map(c=>`<option value="${c.p}" ${c===pre?'selected':''}>${c.n} — ${R(c.p)}</option>`).join('')}</select>${[['dep','Deposit (%)',0,50,10,5],['n','Term (months)',12,72,60,12],['rate','Interest rate (%)',6,20,12.5,.5],['km','Distance per month (km)',200,4000,1500,100],['fp','Petrol price (R/L)',18,32,24,.5]].map(a=>`<label>${a[1]}: <b id="o${a[0]}">${a[4]}</b></label><input type="range" id="${a[0]}" min="${a[2]}" max="${a[3]}" step="${a[5]}" value="${a[4]}">`).join('')}</div><div class="card" id="res"></div></div></section>`,
+ ()=>{const g=k=>+$('#'+k).value,u=()=>{const p=g('p'),o={dep:g('dep'),n:g('n'),rate:g('rate'),km:g('km'),fp:g('fp')},r=run(p,o.km,6.5,o.fp),pt=[['Finance',fin(p,o.dep,o.n,o.rate),'var(--ac)'],['Fuel',r.fuel,'#4aa3ff'],['Insurance',r.ins,'#f2b84b'],['Maintenance',r.mnt,'#7bd88f']],m=pt.reduce((a,b)=>a+b[1],0);
+ ['dep','n','rate','km','fp'].forEach(k=>$('#o'+k).textContent=g(k));
+ $('#res').innerHTML=`<p class="k">Estimated monthly cost</p><h2>${R(m)}</h2><div class="bar" style="margin:16px 0">${pt.map(a=>`<i style="width:${a[1]/m*100}%;background:${a[2]}"></i>`).join('')}</div>${pt.map(a=>`<p class="ln"><span><span style="color:${a[2]}">●</span> ${a[0]}</span><b>${R(a[1])}</b></p>`).join('')}<p class="k" style="margin-top:18px">Ownership total</p>${[1,3,5].map(y=>`<p class="ln"><span class="mut">${y} year${y>1?'s':''}</span><b>${R(total(p,y,o))}</b></p>`).join('')}<p class="mut" style="font-size:12px;margin-top:10px">Assumes 6.5 L/100 km, insurance 5% and maintenance 1.5% of price a year. Estimates, not finance or insurance offers.</p>`};$('#af').oninput=u;u()}]};
+const cmp=q=>{const a=car(q.get('a'))||CARS[0],b=car(q.get('b'))||CARS[3],op=s=>CARS.map(c=>`<option value="${c.id}" ${c===s?'selected':''}>${c.n}</option>`).join('');
+ const rows=[['Reference price',c=>c.p,R],['Est. monthly cost',c=>fin(c.p)+sum(run(c.p)),R],['Est. 5-year cost',c=>total(c.p,5),R],['Transmission',c=>c.t],['Fuel',c=>c.f],['Body style',c=>c.b]];
+ return [`<section class="sec"><p class="k">Compare</p><h2>Compare two cars.</h2><div class="grid" style="margin:20px 0"><select id="ca">${op(a)}</select><select id="cb">${op(b)}</select></div><div class="card" style="overflow-x:auto"><table><tr><th></th><th>${a.n}</th><th>${b.n}</th></tr>${rows.map(r=>{const x=r[1](a),y=r[1](b),f=r[2]||(v=>v),n=typeof x==='number';return `<tr><td class="mut">${r[0]}</td><td class="${n&&x<y?'w':''}">${f(x)}</td><td class="${n&&y<x?'w':''}">${f(y)}</td></tr>`}).join('')}</table></div><p class="mut" style="font-size:12px;margin-top:10px">Highlight marks the lower cost. Estimates use 10% deposit, 60 months at 12.5%.</p></section>`,
+ ()=>{const f=()=>location.hash=`#/compare?a=${$('#ca').value}&b=${$('#cb').value}`;$('#ca').onchange=$('#cb').onchange=f}]};
+const garage=()=>[`<section class="sec"><p class="k">My garage</p><h2>Saved cars.</h2>${S.saved.length?`<div class="grid" style="margin-top:24px">${S.saved.map(car).filter(Boolean).map(c=>card(c).replace('rv','')+'').join('')}</div><div class="row">${S.saved.map(i=>`<button class="fc" data-rm="${i}">Remove ${car(i).n.split(' ').slice(1,3).join(' ')}</button>`).join('')}</div>`:`<div class="empty" style="margin-top:24px"><b>Your garage is empty</b><p class="mut" style="margin:6px 0 16px">Save cars to compare and revisit them later.</p><a class="btn" href="#/cars">Browse new cars</a></div>`}</section>`];
+const sell=()=>[`<section class="sec hero" style="align-items:start"><div><p class="k">For dealerships & private sellers</p><h2>Find your next buyer.</h2><p class="mut" style="margin-top:12px">List any make, new or used. Add clear details and your asking price.</p></div><div class="card" id="sf">${[['Make','text'],['Model','text'],['Year','number'],['Mileage (km)','number'],['Asking price (R)','number']].map(f=>`<label>${f[0]}</label><input type="${f[1]}" data-f>`).join('')}<label>Description</label><textarea rows="3"></textarea><button class="btn ac" id="go" style="margin-top:16px">Preview listing</button><div id="sr"></div></div></section>`,
+ ()=>$('#go').onclick=()=>{const v=[...document.querySelectorAll('[data-f]')].map(i=>i.value||'—');$('#sr').innerHTML=`<div class="empty" style="margin-top:16px"><b>${v[0]} ${v[1]} · ${v[2]}</b><p class="mut">${v[3]} km · ${isNaN(+v[4])?v[4]:R(+v[4])}</p><p class="mut" style="font-size:12px;margin-top:8px">Preview only — publishing isn't connected in this redesign.</p></div>`}];
+const sign=()=>[`<section class="sec" style="max-width:420px;margin:auto"><p class="k">Welcome back</p><h2>Sign in.</h2><div class="card" style="margin-top:20px"><label>Email</label><input type="email"><label>Password</label><input type="password"><button class="btn ac" id="si" style="margin-top:16px">Sign in</button><p id="sm" class="mut" style="font-size:13px"></p></div></section>`,()=>$('#si').onclick=()=>$('#sm').textContent='Demo only — accounts are not connected in this redesign.'];
+const nf=()=>[`<section class="empty" style="margin-top:40px"><h2>Page not found</h2><p style="margin-top:16px"><a class="btn" href="#/">Back home</a></p></section>`];
+
+/* ---------- shell ---------- */
+const NAV=[['cars','New Cars'],['cars?c=used','Used Cars'],['afford','Affordability'],['compare','Compare'],['garage','My Garage']];
+$('#nv').innerHTML=NAV.map(n=>`<a href="#/${n[0]}">${n[1]}</a>`).join('');
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.1});
+function go(keep){const h=location.hash.slice(2),p=h.split('?'),n=p[0].split('/'),q=new URLSearchParams(p[1]||'');
+ const V={'':home,cars:()=>cars(q),car:()=>detail(n[1]),afford:()=>afford(q),compare:()=>cmp(q),garage,sell,'sign-in':sign}[n[0]]||nf,v=V();
+ M.innerHTML=v[0];if(!keep)scrollTo(0,0);
+ document.querySelectorAll('nav a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#/'+h||(h==='cars'&&a.getAttribute('href')==='#/cars')));
+ if(v[1])v[1]();document.querySelectorAll('.rv').forEach(e=>io.observe(e));ft()}
+const ap=()=>{S.th==='auto'?document.documentElement.removeAttribute('data-theme'):document.documentElement.setAttribute('data-theme',S.th)};
+const ft=()=>document.querySelectorAll('footer .fc').forEach(b=>b.classList.toggle('on',b.dataset.th?b.dataset.th===S.th:b.dataset.q===S.q));
+document.addEventListener('click',e=>{const t=e.target.closest('[data-th],[data-q],[data-save],[data-rm]');if(!t)return;const d=t.dataset;
+ if(d.th){S.th=d.th;sv('cp.t',d.th);ap();ft()}
+ else if(d.q){S.q=d.q;sv('cp.q',d.q);go(1)}
+ else{const i=d.save||d.rm;S.saved=S.saved.includes(i)?S.saved.filter(x=>x!==i):[...S.saved,i];sv('cp.s',S.saved);go(1)}});
+addEventListener('hashchange',()=>go());ap();go();
+</script></body></html>
