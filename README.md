@@ -1,5 +1,23 @@
 # Carpur
 
+A South African automotive UI with a sourced Toyota catalogue, vehicle detail pages, comparison and an affordability calculator.
+
+[Browse the source](https://github.com/thembaxx/carpur)
+
+## Engineering highlights
+
+URL-based filtering and selections, interactive 3D presentation and focused verification scripts. Garage, account and other later-phase pages remain unimplemented.
+
+## Technology
+
+Declared in [package.json](package.json): Next.js `16.4.2` · React `19.3.1` · TypeScript `^5` · Three.js `0.128.0`.
+
+**Quality tooling:** `lint`, `typecheck` scripts are available. See the setup guide below for prerequisites; this documentation pass does not assert that those checks were run.
+
+---
+
+## Project guide
+
 A fresh Next.js App Router foundation for the supplied Carpur redesign. The owner selected a fresh Phase 1 implementation after confirming `thembaxx/carpur` was empty. No backend, catalogue service, auth system, API routes, or database were present to migrate.
 
 ## Run locally
