@@ -1,0 +1,32 @@
+name: Vehicle catalogue and frontend checks
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '19 6 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: carpur-check-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run check:shell
+      - run: npm run check:marketplace
+      - run: node scripts/check-catalogue-freshness.mjs
+      - run: npm run build
