@@ -1,0 +1,24 @@
+name: Catalogue evidence audit
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "37 6 * * 2"
+  pull_request:
+    paths:
+      - "data/**"
+      - "scripts/audit-catalogue.mjs"
+      - ".github/workflows/catalogue-audit.yml"
+permissions:
+  contents: read
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: node scripts/audit-catalogue.mjs
