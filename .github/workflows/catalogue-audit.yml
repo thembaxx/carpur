@@ -1,6 +1,12 @@
 name: Catalogue evidence audit
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "data/**"
+      - "scripts/audit-catalogue.mjs"
+      - ".github/workflows/catalogue-audit.yml"
   schedule:
     - cron: "37 6 * * 2"
   pull_request:
