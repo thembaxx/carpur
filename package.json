@@ -30,7 +30,7 @@
     "@types/three": "0.128.0",
     "eslint": "^9",
     "eslint-config-next": "16.4.2",
-    "pixelmatch": "^7",
+    "pixelmatch": "^8",
     "playwright": "^1.56",
     "pngjs": "^7",
     "typescript": "^5"
