@@ -32,7 +32,15 @@ export function Header({ withActiveRoute = false }: { withActiveRoute?: boolean 
   return (
     <header>
       <Link className="logo" href="/">
-        <Image src="/favicon.svg" width={30} height={30} alt="" aria-hidden="true" className="logo-mark" unoptimized />
+        <Image
+          src="/favicon.svg"
+          width={30}
+          height={30}
+          alt=""
+          aria-hidden="true"
+          className="logo-mark"
+          unoptimized
+        />
         <span>Carpur<i>.</i></span>
       </Link>
       <nav id="nv" aria-label="Main navigation">
