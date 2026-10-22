@@ -10,18 +10,24 @@ export function useReveal<T extends HTMLElement>(enabled = true) {
   useEffect(() => {
     const element = ref.current;
     if (!element || !enabled) return;
-    if (!window.IntersectionObserver || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (
+      !window.IntersectionObserver ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       element.classList.add("in");
       return;
     }
-    observer ??= new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("in");
-          observer?.unobserve(entry.target);
+    observer ??= new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("in");
+            observer?.unobserve(entry.target);
+          }
         }
-      }
-    }, { threshold: 0.1 });
+      },
+      { threshold: 0.1 },
+    );
     observer.observe(element);
     return () => observer?.unobserve(element);
   }, [enabled]);

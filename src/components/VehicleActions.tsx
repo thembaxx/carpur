@@ -14,9 +14,25 @@ export function VehicleActions({ siteId, alias }: { siteId: string; alias: strin
   }
   return (
     <div className="row">
-      <button type="button" className={`btn ${isSaved ? "o" : "ac"}`} data-save={siteId} aria-pressed={isSaved} onClick={toggle}>{isSaved ? "Saved to garage ✓" : "Save to garage"}</button>
-      <Link className="btn o" href={`/compare?a=${encodeURIComponent(siteId)}`} prefetch={false}>Compare</Link>
-      <Link className="btn o" href={`/affordability?id=${encodeURIComponent(siteId)}`} prefetch={false}>Adjust budget</Link>
+      <button
+        type="button"
+        className={`btn ${isSaved ? "o" : "ac"}`}
+        data-save={siteId}
+        aria-pressed={isSaved}
+        onClick={toggle}
+      >
+        {isSaved ? "Saved to garage ✓" : "Save to garage"}
+      </button>
+      <Link className="btn o" href={`/compare?a=${encodeURIComponent(siteId)}`} prefetch={false}>
+        Compare
+      </Link>
+      <Link
+        className="btn o"
+        href={`/affordability?id=${encodeURIComponent(siteId)}`}
+        prefetch={false}
+      >
+        Adjust budget
+      </Link>
     </div>
   );
 }

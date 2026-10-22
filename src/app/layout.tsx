@@ -21,7 +21,8 @@ export const viewport: Viewport = {
   themeColor: "#090b0e",
 };
 
-const themeScript = "try{var t=JSON.parse(localStorage.getItem('cp.t'));if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}";
+const themeScript =
+  "try{var t=JSON.parse(localStorage.getItem('cp.t'));if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t)}catch(e){}";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
