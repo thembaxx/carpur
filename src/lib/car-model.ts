@@ -236,7 +236,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     );
     r.toneMapping = THREE.ACESFilmicToneMapping;
     r.toneMappingExposure = 1.15;
-    r.outputEncoding = THREE.sRGBEncoding;
+    r.outputColorSpace = THREE.SRGBColorSpace;
     el.appendChild(r.domElement);
 
     const cam = new THREE.PerspectiveCamera(32, 1, 0.1, 60);
@@ -263,7 +263,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     ).forEach((a) => x.fillRect(a[0], a[1], a[2], a[3]));
     et = new THREE.CanvasTexture(e);
     et.mapping = THREE.EquirectangularReflectionMapping;
-    et.encoding = THREE.sRGBEncoding;
+    et.colorSpace = THREE.SRGBColorSpace;
     pm = new THREE.PMREMGenerator(r);
     environment = pm.fromEquirectangular(et);
     sc.environment = environment.texture;
