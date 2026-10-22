@@ -21,19 +21,19 @@
     "next": "16.4.2",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "three": "0.128.0"
+    "three": "0.186.1"
   },
   "devDependencies": {
-    "@types/node": "^24",
+    "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/three": "0.128.0",
-    "eslint": "^9",
+    "@types/three": "0.186.0",
+    "eslint": "^10",
     "eslint-config-next": "16.4.2",
-    "pixelmatch": "^7",
-    "playwright": "^1.56",
+    "pixelmatch": "^8",
+    "playwright": "^1.64",
     "pngjs": "^7",
-    "typescript": "^5"
+    "typescript": "^7"
   },
   "engines": {
     "node": ">=22.0.0"
