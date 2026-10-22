@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -31,7 +32,8 @@ export function Header({ withActiveRoute = false }: { withActiveRoute?: boolean 
   return (
     <header>
       <Link className="logo" href="/">
-        Carpur<i>.</i>
+        <Image src="/favicon.svg" width={30} height={30} alt="" aria-hidden="true" className="logo-mark" unoptimized />
+        <span>Carpur<i>.</i></span>
       </Link>
       <nav id="nv" aria-label="Main navigation">
         {withActiveRoute ? (
