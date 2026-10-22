@@ -41,7 +41,9 @@ export function Header({ withActiveRoute = false }: { withActiveRoute?: boolean 
           className="logo-mark"
           unoptimized
         />
-        <span>Carpur<i>.</i></span>
+        <span>
+          Carpur<i>.</i>
+        </span>
       </Link>
       <nav id="nv" aria-label="Main navigation">
         {withActiveRoute ? (
