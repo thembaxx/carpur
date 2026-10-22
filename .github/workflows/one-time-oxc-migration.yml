@@ -1,0 +1,35 @@
+name: One-time Oxlint and Oxfmt migration
+on:
+  push:
+    branches:
+      - chore/deps-latest-stable-20261022
+permissions:
+  contents: write
+concurrency:
+  group: carpur-oxc-migration
+  cancel-in-progress: false
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 24
+      - name: Install Oxlint and Oxfmt and regenerate npm lockfile
+        run: |
+          npm install --save-dev oxlint@latest oxfmt@latest --ignore-scripts --no-audit --no-fund
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run format
+          npm run format:check
+      - name: Commit migration without temporary workflow
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git rm -- .github/workflows/one-time-oxc-migration.yml
+          git add package.json package-lock.json src scripts
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore(tooling): install latest Oxlint and Oxfmt, format sources'
+            git push
+          fi
