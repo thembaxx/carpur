@@ -384,5 +384,15 @@ footer .fc {
 }
 
 /* Branded icon alongside the existing Carpur wordmark. */
-.logo { display: inline-flex; align-items: center; gap: 9px; }
-.logo-mark { display: block; flex: 0 0 30px; width: 30px; height: 30px; border-radius: 8px; }
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.logo-mark {
+  display: block;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+}
