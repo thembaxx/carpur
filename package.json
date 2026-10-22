@@ -16,8 +16,8 @@
     "check:marketplace": "node scripts/check-marketplace.mjs",
     "parity:ownership": "node scripts/parity.mjs --ownership",
     "check:ownership": "node scripts/check-ownership.mjs",
-    "format": "oxfmt --write src scripts",
-    "format:check": "oxfmt --check src scripts",
+    "format": "oxfmt --write src",
+    "format:check": "oxfmt --check src",
     "check": "npm run lint && npm run format:check && npm run typecheck && npm run build"
   },
   "dependencies": {
