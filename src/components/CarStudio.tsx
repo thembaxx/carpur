@@ -31,16 +31,18 @@ export function CarStudio({ body, color, pick = false }: Props) {
       el.setAttribute("aria-label", `Illustrative ${body} silhouette. 3D preview unavailable.`);
     };
     // Keep Three.js out of the server render and load it only for a mounted viewer.
-    void import("@/lib/car-model").then(({ createStudio }) => {
-      if (cancelled) return;
-      try {
-        dispose = createStudio(el, { body, color, pick, quality });
-      } catch {
-        showFallback();
-      }
-    }).catch(() => {
-      if (!cancelled) showFallback();
-    });
+    void import("@/lib/car-model")
+      .then(({ createStudio }) => {
+        if (cancelled) return;
+        try {
+          dispose = createStudio(el, { body, color, pick, quality });
+        } catch {
+          showFallback();
+        }
+      })
+      .catch(() => {
+        if (!cancelled) showFallback();
+      });
     return () => {
       cancelled = true;
       dispose?.();

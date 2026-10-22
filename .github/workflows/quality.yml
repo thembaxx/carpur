@@ -1,7 +1,6 @@
 name: Carpur quality
 on:
   push:
-    branches: [main]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -25,6 +24,7 @@ jobs:
           node-version: 24
       - run: npm ci --ignore-scripts
       - run: npm run lint
+      - run: npm run format:check
       - run: npm run typecheck
       - run: node scripts/check-catalogue-freshness.mjs
       - run: npm run build

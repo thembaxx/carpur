@@ -6,7 +6,7 @@
     "dev": "next dev --hostname 0.0.0.0",
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
-    "lint": "eslint . --max-warnings=0",
+    "lint": "oxlint --deny-warnings src scripts",
     "typecheck": "tsc --noEmit",
     "parity:shell": "node scripts/parity.mjs --shell",
     "check:shell": "node scripts/check-shell.mjs",
@@ -15,25 +15,28 @@
     "parity:marketplace": "node scripts/parity.mjs --marketplace",
     "check:marketplace": "node scripts/check-marketplace.mjs",
     "parity:ownership": "node scripts/parity.mjs --ownership",
-    "check:ownership": "node scripts/check-ownership.mjs"
+    "check:ownership": "node scripts/check-ownership.mjs",
+    "format": "oxfmt --write src",
+    "format:check": "oxfmt --check src",
+    "check": "npm run lint && npm run format:check && npm run typecheck && npm run build"
   },
   "dependencies": {
     "next": "16.4.2",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "three": "0.128.0"
+    "three": "0.186.1"
   },
   "devDependencies": {
-    "@types/node": "^24",
+    "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/three": "0.128.0",
-    "eslint": "^9",
-    "eslint-config-next": "16.4.2",
-    "pixelmatch": "^7",
-    "playwright": "^1.56",
+    "@types/three": "0.186.0",
+    "oxfmt": "^0.74.0",
+    "oxlint": "^1.89.0",
+    "pixelmatch": "^8",
+    "playwright": "^1.64",
     "pngjs": "^7",
-    "typescript": "^5"
+    "typescript": "^7"
   },
   "engines": {
     "node": ">=22.0.0"

@@ -31,7 +31,10 @@ export default async function Vehicle({ params }: Props) {
         <h1 style={{ fontSize: "clamp(34px,6vw,56px)" }}>{R(car.p)}</h1>
         <OwnershipCostCard price={car.p} />
         <VehicleActions siteId={car.siteId} alias={car.id} />
-        <p className="mut" style={{ fontSize: 12 }}>{`3D model is an illustrative ${car.b} body style, not this exact variant. Confirm stock and delivery with a dealer.`}</p>
+        <p
+          className="mut"
+          style={{ fontSize: 12 }}
+        >{`3D model is an illustrative ${car.b} body style, not this exact variant. Confirm stock and delivery with a dealer.`}</p>
         <EnergyModelNote show={car.f !== "Petrol"} />
       </div>
     </section>
