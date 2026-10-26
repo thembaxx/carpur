@@ -6,7 +6,8 @@
   --mut: #666b73;
   --card: #fff;
   --ln: rgba(0, 0, 0, 0.1);
-  --ac: #e8502a;
+  --ac: #be3b1d;
+  --on-ac: #ffffff;
   --hd: rgba(243, 241, 236, 0.86);
   color-scheme: light;
   box-sizing: border-box;
@@ -21,6 +22,7 @@
     --card: #12151a;
     --ln: rgba(255, 255, 255, 0.1);
     --ac: #ff6a3d;
+    --on-ac: #090b0e;
     --hd: rgba(9, 11, 14, 0.86);
     color-scheme: dark;
   }
@@ -32,6 +34,7 @@
   --card: #12151a;
   --ln: rgba(255, 255, 255, 0.1);
   --ac: #ff6a3d;
+  --on-ac: #090b0e;
   --hd: rgba(9, 11, 14, 0.86);
   color-scheme: dark;
 }
@@ -133,7 +136,7 @@ nav a.on {
 }
 .btn.ac {
   background: var(--ac);
-  color: #fff;
+  color: var(--on-ac);
 }
 .btn.o {
   background: none;
