@@ -342,12 +342,33 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       sc.add(garage);
     }
 
+    // Optional presentation-only gallery lighting: never changes model/stock claims or the default studio.
+    const galleryLights = new THREE.Group();
+    const neon = new THREE.MeshBasicMaterial({ color: "#91c6e8", transparent: true, opacity: 0.48, depthWrite: false });
+    for (const radius of [2.62, 3.1]) {
+      const halo = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.012, 6, 80), neon);
+      halo.rotation.x = -Math.PI / 2;
+      halo.position.y = 0.012;
+      galleryLights.add(halo);
+    }
+    for (const x of [-3.3, 3.3]) {
+      const pillar = new THREE.Mesh(
+        new THREE.BoxGeometry(0.035, 1.7, 0.035),
+        new THREE.MeshBasicMaterial({ color: "#b6d4e3", transparent: true, opacity: 0.54 }),
+      );
+      pillar.position.set(x, 0.82, -1.5);
+      galleryLights.add(pillar);
+    }
+    galleryLights.visible = false;
+    sc.add(galleryLights);
+    let gallery = false;
+
     // Orbit state
     let az = 0.8,
       el_ = 0.15,
       tz = az,
       te = el_,
-      auto = true,
+      auto = !window.matchMedia("(prefers-reduced-motion: reduce)").matches,
       drag = false,
       lx = 0,
       ly = 0;
@@ -389,7 +410,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       Object.keys(V)
         .map((k) => `<button type="button" class="chip" data-v="${k}">${k}</button>`)
         .join("") +
-      `<button type="button" class="chip on" data-a="1">Auto-rotate</button>` +
+      `<button type="button" class="chip${auto ? " on" : ""}" data-a="1">Auto-rotate</button>` +
+      `<button type="button" class="chip" data-s="1">Gallery lights</button>` +
       SWATCHES.map(
         (c) =>
           `<button type="button" class="sw" data-c="${c}" style="background:${c}" aria-label="Colour ${c}"></button>`,
@@ -404,7 +426,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     function syncControls() {
       ui.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
         const d = button.dataset;
-        const pressed = d.a ? auto : d.v ? d.v === preset : d.c ? d.c === cc : d.b === bt;
+        const pressed = d.a ? auto : d.s ? gallery : d.v ? d.v === preset : d.c ? d.c === cc : d.b === bt;
         button.setAttribute("aria-pressed", String(pressed));
       });
     }
@@ -424,6 +446,10 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
         auto = !auto;
         preset = undefined;
         t.classList.toggle("on", auto);
+      } else if (d.s) {
+        gallery = !gallery;
+        galleryLights.visible = gallery;
+        t.classList.toggle("on", gallery);
       } else if (d.c) {
         cc = d.c;
         (C!.userData.p as THREE.MeshPhysicalMaterial).color.set(cc);
