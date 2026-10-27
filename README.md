@@ -4,6 +4,19 @@ A South African automotive UI with a sourced Toyota catalogue, vehicle detail pa
 
 [Browse the source](https://github.com/thembaxx/carpur)
 
+## Repository roles
+
+Carpur has two distinct repositories:
+
+| Repository | Responsibility |
+| --- | --- |
+| **[thembaxx/carpur](https://github.com/thembaxx/carpur)** — this repository | The reference-driven presentation implementation: catalogue browsing, illustrative 3D, comparison and affordability UI. Its source of truth remains [HANDOFF.md](HANDOFF.md), [AGENTS.md](AGENTS.md) and [reference/carpur-artifact.html](reference/carpur-artifact.html). |
+| **[thembaxx/nou2](https://github.com/thembaxx/nou2)** | The Carpur marketplace application and its account, seller-listing, enquiry, authenticated garage and database workflows. Consult that repository's current documentation for integration requirements and limits. |
+
+Develop marketplace backend capabilities in `nou2`. This repository does not introduce a second authentication service, seller database or listing API. Future work here follows the presentation-only handoff and coordinates with the marketplace's existing contracts; route names and visual parity requirements do not imply that those services are implemented here.
+
+The repositories have separate source trees, dependencies and deployments. A catalogue entry, saved selection or successful build in this repository is not evidence that an account, seller enquiry or listing has been created in `nou2`.
+
 ## Engineering highlights
 
 URL-based filtering and selections, interactive 3D presentation and focused verification scripts. Garage, account and other later-phase pages remain unimplemented.
@@ -127,7 +140,7 @@ The completed checks and their scope are recorded in [PHASE1.md](PHASE1.md), [PH
 
 Read [AGENTS.md](AGENTS.md), [HANDOFF.md](HANDOFF.md), and [PROMPTS.md](PROMPTS.md). The visual source of truth is [reference/carpur-artifact.html](reference/carpur-artifact.html).
 
-1. Phase 5: implement Garage, real Sell and Sign-in flows, Sources, and Privacy. A backend/auth choice or import is required for the real flows.
+1. Phase 5: complete the Garage, Sell, Sign-in, Sources and Privacy presentation when that phase is taken up. Real account, listing and enquiry capabilities belong to `nou2`; coordinate any UI integration with its existing contracts instead of adding a duplicate backend here. The existing handoff's route and reference requirements remain the presentation acceptance criteria.
 2. Phase 6: complete full-route parity and the acceptance checklist. Production OG metadata and analytics also remain to be supplied. Decide the launch financial model using [COST-ASSUMPTIONS.md](COST-ASSUMPTIONS.md).
 
 The completed Phases 1–3 foundation was published to GitHub `main` at `6f0ef68`; Phase 4 continues on a separate branch. Deployment remains separate from these implementation phases.
