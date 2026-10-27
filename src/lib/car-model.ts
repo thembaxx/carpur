@@ -310,6 +310,38 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     };
     mk();
 
+    // Opt-in presentation experiment. The reference studio remains pixel-identical
+    // unless ?studio=garage is explicitly present in the address bar.
+    if (new URLSearchParams(window.location.search).get("studio") === "garage") {
+      const garage = new THREE.Group();
+      const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(6, 4),
+        new THREE.MeshStandardMaterial({ color: "#29333a", metalness: 0.12, roughness: 0.82 }),
+      );
+      floor.rotation.x = -Math.PI / 2;
+      floor.position.y = -0.018;
+      garage.add(floor);
+      for (const x of [-2.6, 2.6]) {
+        const rail = new THREE.Mesh(
+          new THREE.BoxGeometry(0.045, 0.012, 3.6),
+          new THREE.MeshBasicMaterial({ color: "#73808a" }),
+        );
+        rail.position.set(x, -0.007, 0);
+        garage.add(rail);
+      }
+      for (const x of [-2.9, 2.9]) {
+        for (const z of [-1.65, 1.65]) {
+          const marker = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.06, 0.07, 0.3, 8),
+            new THREE.MeshStandardMaterial({ color: "#e0aa68", roughness: 0.8 }),
+          );
+          marker.position.set(x, 0.15, z);
+          garage.add(marker);
+        }
+      }
+      sc.add(garage);
+    }
+
     // Orbit state
     let az = 0.8,
       el_ = 0.15,
