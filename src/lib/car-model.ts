@@ -7,6 +7,7 @@
  * Axes: car length on X (front = +X), width on Z, height on Y. Wheelbase x = ±1.3, wheel radius 0.35.
  */
 import * as THREE from "three";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 
 export type Body = "hatch" | "suv" | "mpv";
 export type Quality = "auto" | "save" | "high";
@@ -362,6 +363,23 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     galleryLights.visible = false;
     sc.add(galleryLights);
     let gallery = false;
+    let galleryModelRequested = false;
+    const loadOriginalGallery = () => {
+      if (galleryModelRequested) return;
+      galleryModelRequested = true;
+      new GLTFLoader().load(
+        "/models/original/carpur-gallery-platform.glb",
+        ({ scene }) => {
+          if (disposed) {
+            disposeObject(scene);
+            return;
+          }
+          galleryLights.add(scene);
+        },
+        undefined,
+        () => { /* Existing procedural gallery lights remain usable offline. */ },
+      );
+    };
 
     // Orbit state
     let az = 0.8,
@@ -449,6 +467,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       } else if (d.s) {
         gallery = !gallery;
         galleryLights.visible = gallery;
+        if (gallery) loadOriginalGallery();
         t.classList.toggle("on", gallery);
       } else if (d.c) {
         cc = d.c;
