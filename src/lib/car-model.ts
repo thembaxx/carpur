@@ -367,10 +367,18 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     const loadOriginalGallery = () => {
       if (galleryModelRequested) return;
       galleryModelRequested = true;
-      new GLTFLoader().load("/models/original/carpur-gallery-platform.glb", ({ scene }) => {
-        if (disposed) { disposeObject(scene); return; }
-        galleryLights.add(scene);
-      }, undefined, () => { /* Existing procedural gallery lights remain usable offline. */ });
+      new GLTFLoader().load(
+        "/models/original/carpur-gallery-platform.glb",
+        ({ scene }) => {
+          if (disposed) {
+            disposeObject(scene);
+            return;
+          }
+          galleryLights.add(scene);
+        },
+        undefined,
+        () => { /* Existing procedural gallery lights remain usable offline. */ },
+      );
     };
 
     // Orbit state
