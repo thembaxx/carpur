@@ -140,12 +140,12 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForFunction(() => {
     const stage = document.querySelector(".stage"), canvas = stage.querySelector("canvas");
-    return canvas.width === Math.floor(stage.clientWidth * 2) && canvas.height === Math.floor(stage.clientHeight * 2);
+    return canvas.width === Math.floor(stage.clientWidth * 1.25) && canvas.height === Math.floor(stage.clientHeight * 1.25);
   }, undefined, { polling: 50 });
   assert.equal(await page.locator(".stage").evaluate((element) => getComputedStyle(element).touchAction), "pan-y");
   await page.locator('.stage [data-v="Front"]').focus(); await page.keyboard.press("Space"); await settleStudio(page);
   assert.equal(await page.locator('.stage [data-v="Front"]').getAttribute("aria-pressed"), "true");
-  pass("ResizeObserver resizes the drawing buffer; touch pan-y and keyboard controls work");
+  pass("ResizeObserver adapts automatic quality to mobile, while touch pan-y and keyboard controls work");
 
   await page.evaluate(() => window.history.pushState(null, "", "/studio?viewer=0"));
   await page.waitForFunction(() => !document.querySelector(".stage"), undefined, { polling: 50 });
