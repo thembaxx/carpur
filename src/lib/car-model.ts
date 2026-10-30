@@ -217,7 +217,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     cancelAnimationFrame(raf);
     ro?.disconnect();
     visibilityObserver?.disconnect();
-    if (pageVisibilityListener) document.removeEventListener("visibilitychange", pageVisibilityListener);
+    if (pageVisibilityListener)
+      document.removeEventListener("visibilitychange", pageVisibilityListener);
     canvas.onpointerdown =
       canvas.onpointermove =
       canvas.onpointerup =
@@ -358,7 +359,12 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
 
     // Optional presentation-only gallery lighting: never changes model/stock claims or the default studio.
     const galleryLights = new THREE.Group();
-    const neon = new THREE.MeshBasicMaterial({ color: "#91c6e8", transparent: true, opacity: 0.48, depthWrite: false });
+    const neon = new THREE.MeshBasicMaterial({
+      color: "#91c6e8",
+      transparent: true,
+      opacity: 0.48,
+      depthWrite: false,
+    });
     for (const radius of [2.62, 3.1]) {
       const halo = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.012, 6, 80), neon);
       halo.rotation.x = -Math.PI / 2;
@@ -390,7 +396,9 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
           galleryLights.add(scene);
         },
         undefined,
-        () => { /* Existing procedural gallery lights remain usable offline. */ },
+        () => {
+          /* Existing procedural gallery lights remain usable offline. */
+        },
       );
     };
 
@@ -457,7 +465,15 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     function syncControls() {
       ui.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
         const d = button.dataset;
-        const pressed = d.a ? auto : d.s ? gallery : d.v ? d.v === preset : d.c ? d.c === cc : d.b === bt;
+        const pressed = d.a
+          ? auto
+          : d.s
+            ? gallery
+            : d.v
+              ? d.v === preset
+              : d.c
+                ? d.c === cc
+                : d.b === bt;
         button.setAttribute("aria-pressed", String(pressed));
       });
     }
@@ -543,15 +559,18 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     };
     document.addEventListener("visibilitychange", pageVisibilityListener);
     if (typeof IntersectionObserver !== "undefined") {
-      visibilityObserver = new IntersectionObserver(([entry]) => {
-        visible = entry.isIntersecting;
-        if (!visible) {
-          cancelAnimationFrame(raf);
-          raf = 0;
-        } else {
-          resume();
-        }
-      }, { threshold: 0.01 });
+      visibilityObserver = new IntersectionObserver(
+        ([entry]) => {
+          visible = entry.isIntersecting;
+          if (!visible) {
+            cancelAnimationFrame(raf);
+            raf = 0;
+          } else {
+            resume();
+          }
+        },
+        { threshold: 0.01 },
+      );
       visibilityObserver.observe(el);
     }
     resume();
