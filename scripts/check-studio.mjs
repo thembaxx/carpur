@@ -39,12 +39,12 @@ try {
   await page.locator('.stage [data-v="Side"]').waitFor({ state: "attached" });
   await page.evaluate(() => document.fonts.ready);
   assert.equal(await page.locator(".stage canvas").count(), 1);
-  assert.equal(await page.locator(".stage button").count(), 13);
+  assert.equal(await page.locator(".stage button").count(), 14);
   assert.ok(await page.locator(".stage button").evaluateAll((buttons) => buttons.every((button) => button.type === "button" && button.hasAttribute("aria-pressed") && (button.textContent.trim() || button.getAttribute("aria-label")))));
   assert.equal(await page.locator('.stage [data-a]').getAttribute("aria-pressed"), "true");
   assert.equal(await page.locator('.stage [data-b="suv"]').getAttribute("aria-pressed"), "true");
   assert.equal(await page.locator('.stage [data-c="#b3422e"]').getAttribute("aria-pressed"), "true");
-  pass("One renderer, thirteen named controls, SUV/red defaults, auto-rotate enabled");
+  pass("One renderer, fourteen named controls, SUV/red defaults, auto-rotate enabled");
 
   const views = [];
   for (const name of ["3/4", "Side", "Front", "Rear"]) {
