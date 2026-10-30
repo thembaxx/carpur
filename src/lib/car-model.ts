@@ -204,6 +204,10 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
   }
   const sc = new THREE.Scene();
   let ro: ResizeObserver | undefined;
+  let visibilityObserver: IntersectionObserver | undefined;
+  let pageVisibilityListener: (() => void) | undefined;
+  let autoQualityMedia: MediaQueryList | undefined;
+  let onAutoQualityChange: (() => void) | undefined;
   let environment: THREE.WebGLRenderTarget | undefined;
   let pm: THREE.PMREMGenerator | undefined;
   let et: THREE.CanvasTexture | undefined;
@@ -214,6 +218,11 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     disposed = true;
     cancelAnimationFrame(raf);
     ro?.disconnect();
+    visibilityObserver?.disconnect();
+    if (autoQualityMedia && onAutoQualityChange)
+      autoQualityMedia.removeEventListener("change", onAutoQualityChange);
+    if (pageVisibilityListener)
+      document.removeEventListener("visibilitychange", pageVisibilityListener);
     canvas.onpointerdown =
       canvas.onpointermove =
       canvas.onpointerup =
@@ -232,9 +241,14 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
   };
 
   try {
-    r.setPixelRatio(
-      Math.min(window.devicePixelRatio, quality === "save" ? 1 : quality === "high" ? 2.5 : 2),
-    );
+    const autoMedia = window.matchMedia("(max-width: 760px), (pointer: coarse)");
+    autoQualityMedia = autoMedia;
+    const pixelRatio = () =>
+      Math.min(
+        window.devicePixelRatio || 1,
+        quality === "save" ? 1 : quality === "high" ? 2.5 : autoMedia.matches ? 1.25 : 2,
+      );
+    r.setPixelRatio(pixelRatio());
     r.toneMapping = THREE.ACESFilmicToneMapping;
     r.toneMappingExposure = 1.15;
     r.outputColorSpace = THREE.SRGBColorSpace;
@@ -345,7 +359,12 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
 
     // Optional presentation-only gallery lighting: never changes model/stock claims or the default studio.
     const galleryLights = new THREE.Group();
-    const neon = new THREE.MeshBasicMaterial({ color: "#91c6e8", transparent: true, opacity: 0.48, depthWrite: false });
+    const neon = new THREE.MeshBasicMaterial({
+      color: "#91c6e8",
+      transparent: true,
+      opacity: 0.48,
+      depthWrite: false,
+    });
     for (const radius of [2.62, 3.1]) {
       const halo = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.012, 6, 80), neon);
       halo.rotation.x = -Math.PI / 2;
@@ -377,7 +396,9 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
           galleryLights.add(scene);
         },
         undefined,
-        () => { /* Existing procedural gallery lights remain usable offline. */ },
+        () => {
+          /* Existing procedural gallery lights remain usable offline. */
+        },
       );
     };
 
@@ -444,7 +465,15 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     function syncControls() {
       ui.querySelectorAll<HTMLButtonElement>("button").forEach((button) => {
         const d = button.dataset;
-        const pressed = d.a ? auto : d.s ? gallery : d.v ? d.v === preset : d.c ? d.c === cc : d.b === bt;
+        const pressed = d.a
+          ? auto
+          : d.s
+            ? gallery
+            : d.v
+              ? d.v === preset
+              : d.c
+                ? d.c === cc
+                : d.b === bt;
         button.setAttribute("aria-pressed", String(pressed));
       });
     }
@@ -485,21 +514,27 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       const w = el.clientWidth,
         h = el.clientHeight;
       if (!w || !h) return;
+      const nextRatio = pixelRatio();
+      if (r.getPixelRatio() !== nextRatio) r.setPixelRatio(nextRatio);
       r.setSize(w, h, false);
       cam.aspect = w / h;
       cam.updateProjectionMatrix();
     };
     ro = new ResizeObserver(rs);
     ro.observe(el);
+    onAutoQualityChange = () => rs();
+    autoMedia.addEventListener("change", onAutoQualityChange);
     rs();
 
+    let visible = true;
     const tick = () => {
+      raf = 0;
       if (disposed) return;
       if (!el.isConnected) {
         dispose();
         return;
       }
-      raf = requestAnimationFrame(tick);
+      if (document.hidden || !visible) return;
       if (auto && !drag) tz += 0.004;
       az += (tz - az) * 0.1;
       el_ += (te - el_) * 0.1;
@@ -511,8 +546,36 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       );
       cam.lookAt(0, 0.45, 0);
       r.render(sc, cam);
+      raf = requestAnimationFrame(tick);
     };
-    tick();
+    const resume = () => {
+      if (!disposed && !raf && !document.hidden && visible) raf = requestAnimationFrame(tick);
+    };
+    pageVisibilityListener = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else {
+        resume();
+      }
+    };
+    document.addEventListener("visibilitychange", pageVisibilityListener);
+    if (typeof IntersectionObserver !== "undefined") {
+      visibilityObserver = new IntersectionObserver(
+        ([entry]) => {
+          visible = entry.isIntersecting;
+          if (!visible) {
+            cancelAnimationFrame(raf);
+            raf = 0;
+          } else {
+            resume();
+          }
+        },
+        { threshold: 0.01 },
+      );
+      visibilityObserver.observe(el);
+    }
+    resume();
 
     return dispose;
   } catch (error) {
