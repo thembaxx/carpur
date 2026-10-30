@@ -246,13 +246,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     const pixelRatio = () =>
       Math.min(
         window.devicePixelRatio || 1,
-        quality === "save"
-          ? 1
-          : quality === "high"
-            ? 2.5
-            : autoMedia.matches
-              ? 1.25
-              : 2,
+        quality === "save" ? 1 : quality === "high" ? 2.5 : autoMedia.matches ? 1.25 : 2,
       );
     r.setPixelRatio(pixelRatio());
     r.toneMapping = THREE.ACESFilmicToneMapping;
