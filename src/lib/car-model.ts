@@ -241,7 +241,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
   };
 
   try {
-    autoQualityMedia = window.matchMedia("(max-width: 760px), (pointer: coarse)");
+    const autoMedia = window.matchMedia("(max-width: 760px), (pointer: coarse)");
+    autoQualityMedia = autoMedia;
     const pixelRatio = () =>
       Math.min(
         window.devicePixelRatio || 1,
@@ -249,7 +250,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
           ? 1
           : quality === "high"
             ? 2.5
-            : autoQualityMedia.matches
+            : autoMedia.matches
               ? 1.25
               : 2,
       );
@@ -528,7 +529,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     ro = new ResizeObserver(rs);
     ro.observe(el);
     onAutoQualityChange = () => rs();
-    autoQualityMedia.addEventListener("change", onAutoQualityChange);
+    autoMedia.addEventListener("change", onAutoQualityChange);
     rs();
 
     let visible = true;
