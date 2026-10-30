@@ -204,6 +204,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
   }
   const sc = new THREE.Scene();
   let ro: ResizeObserver | undefined;
+  let visibilityObserver: IntersectionObserver | undefined;
+  let pageVisibilityListener: (() => void) | undefined;
   let environment: THREE.WebGLRenderTarget | undefined;
   let pm: THREE.PMREMGenerator | undefined;
   let et: THREE.CanvasTexture | undefined;
@@ -214,6 +216,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     disposed = true;
     cancelAnimationFrame(raf);
     ro?.disconnect();
+    visibilityObserver?.disconnect();
+    if (pageVisibilityListener) document.removeEventListener("visibilitychange", pageVisibilityListener);
     canvas.onpointerdown =
       canvas.onpointermove =
       canvas.onpointerup =
@@ -232,9 +236,18 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
   };
 
   try {
-    r.setPixelRatio(
-      Math.min(window.devicePixelRatio, quality === "save" ? 1 : quality === "high" ? 2.5 : 2),
-    );
+    const pixelRatio = () =>
+      Math.min(
+        window.devicePixelRatio || 1,
+        quality === "save"
+          ? 1
+          : quality === "high"
+            ? 2.5
+            : window.matchMedia("(max-width: 760px), (pointer: coarse)").matches
+              ? 1.25
+              : 2,
+      );
+    r.setPixelRatio(pixelRatio());
     r.toneMapping = THREE.ACESFilmicToneMapping;
     r.toneMappingExposure = 1.15;
     r.outputColorSpace = THREE.SRGBColorSpace;
@@ -485,6 +498,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       const w = el.clientWidth,
         h = el.clientHeight;
       if (!w || !h) return;
+      const nextRatio = pixelRatio();
+      if (r.getPixelRatio() !== nextRatio) r.setPixelRatio(nextRatio);
       r.setSize(w, h, false);
       cam.aspect = w / h;
       cam.updateProjectionMatrix();
@@ -493,13 +508,15 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     ro.observe(el);
     rs();
 
+    let visible = true;
     const tick = () => {
+      raf = 0;
       if (disposed) return;
       if (!el.isConnected) {
         dispose();
         return;
       }
-      raf = requestAnimationFrame(tick);
+      if (document.hidden || !visible) return;
       if (auto && !drag) tz += 0.004;
       az += (tz - az) * 0.1;
       el_ += (te - el_) * 0.1;
@@ -511,8 +528,33 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       );
       cam.lookAt(0, 0.45, 0);
       r.render(sc, cam);
+      raf = requestAnimationFrame(tick);
     };
-    tick();
+    const resume = () => {
+      if (!disposed && !raf && !document.hidden && visible) raf = requestAnimationFrame(tick);
+    };
+    pageVisibilityListener = () => {
+      if (document.hidden) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      } else {
+        resume();
+      }
+    };
+    document.addEventListener("visibilitychange", pageVisibilityListener);
+    if (typeof IntersectionObserver !== "undefined") {
+      visibilityObserver = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (!visible) {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        } else {
+          resume();
+        }
+      }, { threshold: 0.01 });
+      visibilityObserver.observe(el);
+    }
+    resume();
 
     return dispose;
   } catch (error) {
