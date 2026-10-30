@@ -206,6 +206,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
   let ro: ResizeObserver | undefined;
   let visibilityObserver: IntersectionObserver | undefined;
   let pageVisibilityListener: (() => void) | undefined;
+  let autoQualityMedia: MediaQueryList | undefined;
+  let onAutoQualityChange: (() => void) | undefined;
   let environment: THREE.WebGLRenderTarget | undefined;
   let pm: THREE.PMREMGenerator | undefined;
   let et: THREE.CanvasTexture | undefined;
@@ -217,6 +219,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     cancelAnimationFrame(raf);
     ro?.disconnect();
     visibilityObserver?.disconnect();
+    if (autoQualityMedia && onAutoQualityChange)
+      autoQualityMedia.removeEventListener("change", onAutoQualityChange);
     if (pageVisibilityListener)
       document.removeEventListener("visibilitychange", pageVisibilityListener);
     canvas.onpointerdown =
@@ -237,6 +241,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
   };
 
   try {
+    autoQualityMedia = window.matchMedia("(max-width: 760px), (pointer: coarse)");
     const pixelRatio = () =>
       Math.min(
         window.devicePixelRatio || 1,
@@ -244,7 +249,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
           ? 1
           : quality === "high"
             ? 2.5
-            : window.matchMedia("(max-width: 760px), (pointer: coarse)").matches
+            : autoQualityMedia.matches
               ? 1.25
               : 2,
       );
@@ -522,6 +527,8 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     };
     ro = new ResizeObserver(rs);
     ro.observe(el);
+    onAutoQualityChange = () => rs();
+    autoQualityMedia.addEventListener("change", onAutoQualityChange);
     rs();
 
     let visible = true;
