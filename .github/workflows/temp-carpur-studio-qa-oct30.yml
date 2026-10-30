@@ -1,0 +1,29 @@
+name: Temporary Carpur studio browser QA
+on:
+  push:
+    branches:
+      - perf/studio-visibility-quality-oct30
+permissions:
+  contents: read
+jobs:
+  studio-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "24"
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build
+      - name: Test studio views, swatches, quality, and renderer teardown
+        run: |
+          npm run start > /tmp/carpur-next.log 2>&1 &
+          for i in $(seq 1 60); do
+            if curl -fsS http://localhost:3000/studio >/dev/null; then break; fi
+            sleep 2
+          done
+          npm run check:studio
+      - if: failure()
+        run: cat /tmp/carpur-next.log || true
