@@ -1,0 +1,45 @@
+name: Three.js r187 studio compatibility
+on:
+  pull_request:
+    paths:
+      - "src/lib/car-model.ts"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/three-r187-compat.yml"
+permissions:
+  contents: read
+jobs:
+  parity:
+    name: build and reference studio parity
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run lint && npm run format:check && npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Start production server
+        run: |
+          npm run start > /tmp/carpur-server.log 2>&1 &
+          for i in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:3000/studio > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/carpur-server.log
+          exit 1
+      - run: npm run check:studio
+      - run: npm run parity:studio
+      - name: Attach parity diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: carpur-r187-parity
+          path: parity/
+          if-no-files-found: ignore
