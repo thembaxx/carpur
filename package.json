@@ -25,13 +25,13 @@
     "next": "16.4.3",
     "react": "19.3.1",
     "react-dom": "19.3.1",
-    "three": "0.186.1"
+    "three": "0.187.0"
   },
   "devDependencies": {
     "@types/node": "^26",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/three": "0.186.0",
+    "@types/three": "0.187.0",
     "oxfmt": "^0.74.0",
     "oxlint": "^1.89.0",
     "pixelmatch": "^8",
