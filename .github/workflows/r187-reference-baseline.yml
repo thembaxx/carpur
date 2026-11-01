@@ -1,0 +1,59 @@
+name: Carpur original reference baseline (unchanged main)
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/r187-reference-baseline.yml"
+      - "package.json"
+      - "package-lock.json"
+      - "src/lib/car-model.ts"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  reference-baseline:
+    name: Measure current main against original reference
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Check out unchanged main for an independent baseline
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: main
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Compare unchanged main to retained reference
+        shell: bash
+        run: |
+          npm run start > "$RUNNER_TEMP/carpur-reference-baseline.log" 2>&1 &
+          for i in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:3000/studio >/dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:3000/studio >/dev/null
+          set +e
+          npm run parity:studio
+          parity_status=$?
+          set -e
+          echo "Unchanged main parity exit status: $parity_status" >> "$GITHUB_STEP_SUMMARY"
+          echo "The reference was tuned for r128, while current main uses r186. This is a baseline measurement, not a pass gate." >> "$GITHUB_STEP_SUMMARY"
+          if [ -f parity/studio-results.json ]; then
+            cat parity/studio-results.json
+            echo '### Exact parity report' >> "$GITHUB_STEP_SUMMARY"
+            echo '```json' >> "$GITHUB_STEP_SUMMARY"
+            cat parity/studio-results.json >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Retain independent baseline evidence
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: carpur-r186-main-reference-baseline
+          path: parity/
+          if-no-files-found: warn
+          retention-days: 7
