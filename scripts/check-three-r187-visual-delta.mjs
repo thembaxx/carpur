@@ -9,11 +9,20 @@ const candidateDir = process.argv[3];
 if (!baselineDir || !candidateDir) {
   throw new Error("Expected baseline and candidate screenshot directories");
 }
+const states = [
+  "hero", "studio-suv-3-4", "studio-suv-side", "studio-suv-front", "studio-suv-rear",
+  "studio-hatch-side", "studio-mpv-side", "studio-silver", "studio-blue",
+  "studio-green", "studio-black",
+];
+const expected = states.flatMap((state) =>
+  [390, 1440].flatMap((width) =>
+    ["light", "dark"].map((scheme) => `${state}-${width}-${scheme}.png`),
+  ),
+).sort();
 const files = readdirSync(baselineDir).filter((name) => name.endsWith(".png")).sort();
-if (files.length < 44) throw new Error(`Expected 44 stage/hero samples, got ${files.length}`);
 const actual = readdirSync(candidateDir).filter((name) => name.endsWith(".png")).sort();
-if (files.join("|") !== actual.join("|")) {
-  throw new Error("Baseline and candidate screenshot inventories differ");
+if (files.join("|") !== expected.join("|") || actual.join("|") !== expected.join("|")) {
+  throw new Error("Missing or unexpected baseline/candidate screenshot: expected exactly 44 named views");
 }
 const reports = [];
 for (const name of files) {
