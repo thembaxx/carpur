@@ -50,7 +50,7 @@ jobs:
       - name: Independently build and capture unchanged r186 main
         shell: bash
         run: |
-          git worktree add --detach "$RUNNER_TEMP/carpur-main" origin/main
+          git worktree add --detach "$RUNNER_TEMP/carpur-main" "${{ github.event.pull_request.base.sha }}"
           cd "$RUNNER_TEMP/carpur-main"
           npm ci --ignore-scripts
           npm run build
