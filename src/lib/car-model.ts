@@ -336,6 +336,22 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       floor.rotation.x = -Math.PI / 2;
       floor.position.y = -0.018;
       garage.add(floor);
+      // Subtle studio turntable detail; only visible with ?studio=garage.
+      const inset = new THREE.Mesh(
+        new THREE.TorusGeometry(1.82, 0.016, 6, 96),
+        new THREE.MeshBasicMaterial({
+          color: "#a1c6d9",
+          transparent: true,
+          opacity: 0.32,
+          depthWrite: false,
+        }),
+      );
+      inset.rotation.x = -Math.PI / 2;
+      inset.position.y = 0.006;
+      garage.add(inset);
+      const showroomFill = new THREE.DirectionalLight("#d9ecff", 0.38);
+      showroomFill.position.set(-4, 4, -3);
+      garage.add(showroomFill);
       for (const x of [-2.6, 2.6]) {
         const rail = new THREE.Mesh(
           new THREE.BoxGeometry(0.045, 0.012, 3.6),
