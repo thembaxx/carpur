@@ -1,0 +1,42 @@
+name: Three.js r187 studio parity
+on:
+  pull_request:
+    paths:
+      - "src/lib/car-model.ts"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/threejs-r187-parity.yml"
+permissions:
+  contents: read
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Studio interaction and GPU lifecycle regression
+        run: |
+          npm run start > "$RUNNER_TEMP/carpur-three-r187.log" 2>&1 &
+          curl --fail --silent --retry 30 --retry-delay 1 --retry-connrefused --max-time 2 http://localhost:3000/ > /dev/null
+          npm run check:studio
+      - name: Visual parity against retained reference at both viewports and themes
+        run: npm run parity:studio
+      - name: Save visual evidence on failure
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: carpur-r187-parity-evidence
+          path: parity/
+          if-no-files-found: ignore
