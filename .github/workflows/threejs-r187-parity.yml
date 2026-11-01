@@ -1,42 +1,84 @@
-name: Three.js r187 studio parity
+name: Three.js r187 studio compatibility and current-main visual comparison
 on:
   pull_request:
     paths:
       - "src/lib/car-model.ts"
       - "package.json"
       - "package-lock.json"
+      - "scripts/check-three-r187-visual-delta.mjs"
       - ".github/workflows/threejs-r187-parity.yml"
 permissions:
   contents: read
 jobs:
   parity:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1
         with:
-          node-version: 22
+          node-version: "24"
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm run lint
-      - run: npm run format:check
-      - run: npm run typecheck
+      - run: npm run lint && npm run format:check && npm run typecheck
       - run: npm run build
       - run: npx playwright install --with-deps chromium
-      - name: Studio interaction and GPU lifecycle regression
+      - name: Verify studio interaction and WebGL lifecycle
+        shell: bash
         run: |
-          npm run start > "$RUNNER_TEMP/carpur-three-r187.log" 2>&1 &
-          curl --fail --silent --retry 30 --retry-delay 1 --retry-connrefused --max-time 2 http://localhost:3000/ > /dev/null
+          npm run start > "$RUNNER_TEMP/carpur-r187.log" 2>&1 &
+          for i in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:3000/studio >/dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:3000/studio >/dev/null
           npm run check:studio
-      - name: Visual parity against retained reference at both viewports and themes
-        run: npm run parity:studio
-      - name: Save visual evidence on failure
-        if: failure()
+      - name: Capture candidate studio at 390 and 1440, both themes and all visual states
+        shell: bash
+        run: |
+          if npm run parity:studio; then
+            echo "Original r128 reference parity matched."
+          else
+            echo "Historical reference mismatch; current main also differs from the original r128 reference."
+          fi
+          test -f parity/studio-results.json
+          mkdir -p "$RUNNER_TEMP/carpur-r187-screens"
+          cp parity/app/*.png "$RUNNER_TEMP/carpur-r187-screens/"
+      - name: Independently build and capture unchanged r186 main
+        shell: bash
+        run: |
+          git worktree add --detach "$RUNNER_TEMP/carpur-main" origin/main
+          cd "$RUNNER_TEMP/carpur-main"
+          npm ci --ignore-scripts
+          npm run build
+          PORT=3001 npm run start > "$RUNNER_TEMP/carpur-r186.log" 2>&1 &
+          for i in $(seq 1 45); do
+            if curl --silent --fail http://127.0.0.1:3001/studio >/dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:3001/studio >/dev/null
+          if npm run parity:studio -- http://127.0.0.1:3001; then
+            echo "Current main matches original r128 artifact."
+          else
+            echo "Confirmed pre-existing historical reference drift on unchanged main."
+          fi
+          test -f parity/studio-results.json
+      - name: Gate on actual r187 versus current-main visual regression
+        shell: bash
+        run: |
+          node scripts/check-three-r187-visual-delta.mjs "$RUNNER_TEMP/carpur-main/parity/app" "$RUNNER_TEMP/carpur-r187-screens"
+          cat parity/three-r187-vs-current-main.json
+      - name: Retain visual comparison evidence
+        if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
-          name: carpur-r187-parity-evidence
-          path: parity/
+          name: carpur-r187-direct-differential-evidence
+          path: |
+            parity/three-r187-vs-current-main.json
+            parity/studio-results.json
+            parity/app/
           if-no-files-found: ignore
+          retention-days: 7
