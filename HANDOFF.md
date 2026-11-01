@@ -8,7 +8,7 @@ Re-implement the **UI layer** of the existing Carpur app (https://nou2.vercel.ap
 - The artifact is a single-file demo: Sell, Sign in, listings and the 44-variant catalogue are stubbed. Wire the same UI to the app's real logic.
 
 ## 2. Non-negotiables (what "exactly" means)
-1. **Pin `three@0.128.0` and `@types/three@0.128.0`.** The 3D look (tone mapping, sRGB output, PMREM reflections, clearcoat) was tuned on r128. Newer versions change colour management and the cars will look different.
+1. **Current studio: `three@0.187.0` and `@types/three@0.187.0`.** The original supplied artifact was tuned on r128; the implemented app was already using r186 before its owner-approved r187 migration. Retain the source artwork, controls, and wording, and gate any renderer upgrade on build, browser/GPU lifecycle checks, and direct screenshot comparison with the existing production renderer. The historical artifact mismatch is separately documented by the r186 baseline run.
 2. **Use `src/app/globals.css` as-is.** It is the artifact's CSS extracted verbatim (only font stacks changed to `var(--font-sora)`). Do not rewrite it as utility classes. If the repo uses Tailwind, keep it installed but disable preflight or load `globals.css` after it, and don't restyle these components with utilities.
 3. **Same class names and DOM structure** as the reference (`.hero`, `.sec`, `.stage`, `.card`, `.k`, `.fc`, `.chip`, `.sw`, `.bar`, `.ln`, `.empty`, `.rv` ...). The CSS depends on them.
 4. **Copy every string verbatim** from the reference view functions. Don't paraphrase headings, labels or disclaimers.
@@ -16,7 +16,7 @@ Re-implement the **UI layer** of the existing Carpur app (https://nou2.vercel.ap
 
 ## 3. Stack and setup
 - Next.js App Router, TypeScript. Path alias `@/` -> `src/` (adjust imports if the repo has no `src/`).
-- Dependencies to add: `three@0.128.0`, `@types/three@0.128.0`. Optional dev: `playwright` (for `scripts/parity.mjs`).
+- Current dependencies: `three@0.187.0`, `@types/three@0.187.0`. Browser regression testing uses Playwright (`scripts/parity.mjs`, `scripts/check-studio.mjs`, and `scripts/check-three-r187-visual-delta.mjs`).
 - Font: Sora 400/600/700 via `next/font/google` with `variable: "--font-sora"`; put `sora.variable` on `<html>`.
 - `next.config`: allow `assets.cdntoyota.co.za` in `images.remotePatterns` (real car photos).
 - Files in this package to drop in: `src/app/globals.css`, `src/lib/{car-model,data,silhouette}.ts`, `src/lib/prefs.tsx`, `src/components/CarStudio.tsx`, `public/favicon.svg`, `scripts/parity.mjs`.
@@ -104,7 +104,7 @@ Wrap the app in `<PrefsProvider>` (`src/lib/prefs.tsx`).
 - **Lifecycle:** one renderer per stage; `createStudio` returns a dispose function; ResizeObserver handles layout; falls back to the SVG silhouette when WebGL is unavailable.
 - **One deliberate fix vs. v1 of the artifact:** wheel-arch discs on the far side are rotated so they face outward (the artifact now has the same fix).
 - **Original site's extra models** (Ferrari 458, BMW M3 E30 and Corolla Cross GLBs): if the repo has them, keep them as additional picks inside the same control bar. Keep the BMW M3 credit line: "3D: Martin Trafas / TinoD2 · Model Source (Sketchfab) · CC Attribution".
-- **Fidelity upgrade path (optional, later):** model each body in Blender, export Draco-compressed GLB, load with `GLTFLoader` (`three/examples/jsm/loaders/GLTFLoader` exists in r128), name the body material `paint`, and keep the same studio, camera, env and controls.
+- **Fidelity upgrade path (optional, later):** model each body in Blender, export Draco-compressed GLB, load with `GLTFLoader` (`three/examples/jsm/loaders/GLTFLoader` also exists in r187), name the body material `paint`, and keep the same studio, camera, env and controls.
 
 ## 9. Cost model and data caveats
 Formulas are in `src/lib/data.ts` and must match the reference:
@@ -130,4 +130,4 @@ Real listings and used inventory, the full 44-variant catalogue, real Sell and S
 - [ ] Affordability numbers equal the reference for the same inputs (e.g. Starlet, defaults -> same monthly total and 1/3/5-year totals).
 - [ ] Compare highlights the lower cost; garage save/remove persists across reloads.
 - [ ] Copy matches the reference word for word; no layout shift at the 900px breakpoint.
-- [ ] `three` is exactly 0.128.0; `npm run build` and lint pass.
+- [ ] Current Three.js and typings are pinned at 0.187.0; build, lint, typecheck, studio interaction/GPU lifecycle and the current-main screenshot-delta gate pass. The historical r128 reference comparison has known pre-existing drift and should still be documented rather than silently ignored.

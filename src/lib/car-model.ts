@@ -1,8 +1,9 @@
 /**
  * Carpur 3D studio — typed port of buildCar() and studio() from reference/carpur-artifact.html.
  *
- * IMPORTANT: pin `three@0.128.0` and `@types/three@0.128.0`. The look (colour management, tone mapping,
- * PMREM) was tuned on r128. Newer three versions change colour handling and the cars will look different.
+ * Compatibility note: original reference visuals were tuned on r128, although this app
+ * already ran r186 before the optional r187 migration. Compare stage screenshots in
+ * light/dark modes before releasing a new renderer: PMREM and colour can change.
  *
  * Axes: car length on X (front = +X), width on Z, height on Y. Wheelbase x = ±1.3, wheel radius 0.35.
  */
@@ -177,7 +178,7 @@ function disposeObject(object: THREE.Object3D) {
 /** Mounts the orbit studio (canvas + controls) into `el`. Throws if WebGL is unavailable. Returns a dispose fn. */
 export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
   const quality = o.quality ?? "auto";
-  // Use r128's exact context defaults, checking availability before its noisy constructor.
+  // Preserve the reference canvas context defaults across renderer revisions.
   const canvas = document.createElement("canvas");
   const attributes: WebGLContextAttributes = {
     alpha: true,
@@ -365,7 +366,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       opacity: 0.48,
       depthWrite: false,
     });
-    for (const radius of [2.62, 3.1]) {
+    for (const radius of [2.62, 3.1, 3.54]) {
       const halo = new THREE.Mesh(new THREE.TorusGeometry(radius, 0.012, 6, 80), neon);
       halo.rotation.x = -Math.PI / 2;
       halo.position.y = 0.012;
@@ -378,6 +379,12 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       );
       pillar.position.set(x, 0.82, -1.5);
       galleryLights.add(pillar);
+      const cap = new THREE.Mesh(
+        new THREE.SphereGeometry(0.095, 12, 8),
+        new THREE.MeshBasicMaterial({ color: "#c6f0ff", transparent: true, opacity: 0.72 }),
+      );
+      cap.position.set(x, 1.75, -1.5);
+      galleryLights.add(cap);
     }
     galleryLights.visible = false;
     sc.add(galleryLights);
