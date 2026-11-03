@@ -131,3 +131,9 @@ Real listings and used inventory, the full 44-variant catalogue, real Sell and S
 - [ ] Compare highlights the lower cost; garage save/remove persists across reloads.
 - [ ] Copy matches the reference word for word; no layout shift at the 900px breakpoint.
 - [ ] Current Three.js and typings are pinned at 0.187.0; build, lint, typecheck, studio interaction/GPU lifecycle and the current-main screenshot-delta gate pass. The historical r128 reference comparison has known pre-existing drift and should still be documented rather than silently ignored.
+
+### Mobile-native correction (2026-11-03)
+
+The card lift and accent-border hover effect now applies only when the primary pointer supports fine hovering. Touch taps no longer leave cards in a simulated hover state. Desktop hover values, classes, layout, copy, routes, and the 3D renderer are unchanged. This touch-only behavior correction intentionally differs from the original artifact's ungated `a.card:hover` rule.
+
+Validation: the coding environment became unavailable before local build/lint and the 390x844/1440x900 light/dark comparisons could run. Check the PR's GitHub quality workflow results before merging; the device/reference comparisons remain pending. No checks above are marked complete by this patch.
