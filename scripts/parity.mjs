@@ -80,7 +80,7 @@ for (const vp of VIEWPORTS) for (const scheme of SCHEMES) {
     continue;
   }
   const ctx = await browser.newContext({ viewport: { width: vp.w, height: vp.h }, colorScheme: scheme, reducedMotion: "reduce" });
-  if (studioOnly || marketplaceOnly || ownershipOnly) await controlStudioFrames(ctx);
+  await controlStudioFrames(ctx);
   // Layout comparisons use the supplied silhouette fallback on both sides.
   // Healthy manufacturer photos are verified separately by check-marketplace.
   if (marketplaceOnly) await ctx.route("**/_next/image?*", (route) => route.fulfill({ status: 200, contentType: "image/png", body: "intentional invalid image for fallback parity" }));
@@ -162,7 +162,10 @@ for (const vp of VIEWPORTS) for (const scheme of SCHEMES) {
     }
     // Freeze the 3D view on the Side preset so both renders are comparable
     const side3d = page.locator('.stage .chip[data-v="Side"]');
-    if (!shellOnly && await side3d.count()) { await side3d.click(); await page.waitForTimeout(1500); }
+    if (!shellOnly && await side3d.count()) {
+      await studioClick(page, '[data-v="Side"]');
+      await settleStudio(page);
+    }
     await page.evaluate(() => document.querySelectorAll(".rv").forEach((e) => e.classList.add("in")));
     const prefix = `${name}-${vp.w}-${scheme}`;
     if (shellOnly) {
@@ -171,13 +174,10 @@ for (const vp of VIEWPORTS) for (const scheme of SCHEMES) {
         // Isolate the Home footer: its position depends on sections built in later phases.
         // Both sides hide only <main>; shell styles and the source artifact are untouched.
         if (selector === "footer" && name === "home") await page.locator("main").evaluate((element) => { element.style.display = "none"; });
-        try {
-          await page.locator(selector).screenshot({ path: `parity/${side}/${filename}` });
-        } catch (error) {
-          // The streamed Header can replace its identical Suspense fallback during capture.
-          if (!error.message.includes("not attached")) throw error;
-          await page.locator(selector).screenshot({ path: `parity/${side}/${filename}` });
-        }
+        // Use the same frame-controlled capture as the studio comparisons.
+        // Locator screenshots wait for animation stability and can time out
+        // while the reference's WebGL animation keeps the software GPU busy.
+        await captureElement(page, selector, `parity/${side}/${filename}`);
         filenames.add(filename);
       }
       if (name === "not-found") {

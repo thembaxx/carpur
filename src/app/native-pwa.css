@@ -1,6 +1,13 @@
 /* Installed Carpur runs edge-to-edge without browser controls. Preserve native gestures. */
 @media (display-mode: standalone), (display-mode: fullscreen) {
-  html, body { min-height: 100dvh; }
-  body { overscroll-behavior-y: contain; }
-  :is(a, button) { -webkit-tap-highlight-color: transparent; }
+  html,
+  body {
+    min-height: 100dvh;
+  }
+  body {
+    overscroll-behavior-y: contain;
+  }
+  :is(a, button) {
+    -webkit-tap-highlight-color: transparent;
+  }
 }

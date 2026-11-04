@@ -131,3 +131,13 @@ Real listings and used inventory, the full 44-variant catalogue, real Sell and S
 - [ ] Compare highlights the lower cost; garage save/remove persists across reloads.
 - [ ] Copy matches the reference word for word; no layout shift at the 900px breakpoint.
 - [ ] Current Three.js and typings are pinned at 0.187.0; build, lint, typecheck, studio interaction/GPU lifecycle and the current-main screenshot-delta gate pass. The historical r128 reference comparison has known pre-existing drift and should still be documented rather than silently ignored.
+
+### Mobile-native correction (2026-11-03)
+
+The card lift and accent-border hover effect now applies only when the primary pointer supports fine hovering. Touch taps no longer leave cards in a simulated hover state. Desktop hover values, classes, layout, copy, routes, and the 3D renderer are unchanged. This touch-only behavior correction intentionally differs from the original artifact's ungated `a.card:hover` rule.
+
+Validation resumed on 2026-11-04: build and lint pass. The existing shell browser checks pass (saved/system themes, cross-tab preferences, exact navigation state, seven responsive widths, keyboard focus, blocked storage and no runtime errors). Original-artifact screenshots were captured for all nine route pairs at 390x844 and 1440x900 in both themes. The historical artifact remains different from current main; no exact artifact-parity claim is made.
+
+An independently built unchanged main (`ffd8895fbca35c4d20743b2873bfede704e5a61d`) was captured with the same harness. All 20 shell captures are pixel-identical between main and this patch. Across those and the 36 full-page route captures, 47 of 56 are pixel-identical; the remaining nine have identical dimensions, with differences in asynchronous vehicle imagery/studio output and its quality labels. The renderer, data, DOM and copy are unchanged by this patch. Historical reference drift is retained rather than hidden by relaxing the comparison threshold.
+
+The screenshot harness now uses its existing controlled studio frames for every capture mode and the existing element-capture helper for shell crops. This fixes the software-GPU/animation-stability timeout without changing production motion or the reference artifact. No unrelated acceptance-checklist items above are marked complete.
