@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: "New cars and second-hand finds, with a clear view of what each one costs to own.",
   applicationName: "Carpur",
   manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, title: "Carpur", statusBarStyle: "black-translucent" },
+  appleWebApp: { capable: true, title: "Carpur", statusBarStyle: "default" },
   formatDetection: { telephone: false },
   icons: { icon: "/favicon.svg", apple: "/api/pwa-icon/192" },
 };
