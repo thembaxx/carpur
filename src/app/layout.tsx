@@ -4,20 +4,26 @@ import { Suspense, type ReactNode } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { PrefsProvider } from "@/lib/prefs";
+import { PwaRegister } from "@/components/PwaRegister";
 import "./globals.css";
+import "./native-pwa.css";
 
 const sora = Sora({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-sora" });
 
 export const metadata: Metadata = {
   title: "Carpur — Find your next car",
   description: "New cars and second-hand finds, with a clear view of what each one costs to own.",
-  icons: { icon: "/favicon.svg" },
+  applicationName: "Carpur",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "Carpur", statusBarStyle: "default" },
+  icons: { icon: "/favicon.svg", apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  colorScheme: "light dark",
   themeColor: "#090b0e",
 };
 
@@ -31,6 +37,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
+        <PwaRegister />
         <PrefsProvider>
           <Suspense fallback={<Header />}>
             <Header withActiveRoute />
