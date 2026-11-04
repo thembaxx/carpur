@@ -399,3 +399,44 @@ footer .fc {
   height: 30px;
   border-radius: 8px;
 }
+
+/* Native install/update notice; never obscures the device gesture area. */
+.pwa-native-actions {
+  position: fixed;
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
+  left: max(16px, env(safe-area-inset-left, 0px));
+  width: fit-content;
+  max-width: min(420px, calc(100vw - 32px));
+  margin-left: auto;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--ln);
+  background: var(--card);
+  color: var(--fg);
+  box-shadow: 0 14px 40px #0003;
+  font-size: 14px;
+}
+.pwa-native-actions button {
+  cursor: pointer;
+  color: var(--on-ac);
+  background: var(--ac);
+  border: 0;
+  border-radius: 10px;
+  min-height: 44px;
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 700;
+}
+.pwa-native-actions button:focus-visible {
+  outline: 3px solid var(--fg);
+  outline-offset: 3px;
+}
+@media (display-mode: standalone) {
+  html, body { min-height: 100dvh; }
+}

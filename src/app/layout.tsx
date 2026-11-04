@@ -3,6 +3,7 @@ import { Sora } from "next/font/google";
 import { Suspense, type ReactNode } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { PwaRuntime } from "@/components/PwaRuntime";
 import { PrefsProvider } from "@/lib/prefs";
 import "./globals.css";
 
@@ -11,7 +12,11 @@ const sora = Sora({ subsets: ["latin"], weight: ["400", "600", "700"], variable:
 export const metadata: Metadata = {
   title: "Carpur — Find your next car",
   description: "New cars and second-hand finds, with a clear view of what each one costs to own.",
-  icons: { icon: "/favicon.svg" },
+  applicationName: "Carpur",
+  manifest: "/manifest.webmanifest",
+  appleWebApp: { capable: true, title: "Carpur", statusBarStyle: "default" },
+  formatDetection: { telephone: false },
+  icons: { icon: "/favicon.svg", apple: "/api/pwa-icon/192" },
 };
 
 export const viewport: Viewport = {
@@ -37,6 +42,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           </Suspense>
           <main id="m">{children}</main>
           <Footer />
+          <PwaRuntime />
         </PrefsProvider>
         <a
           href="/vision/index.html"
