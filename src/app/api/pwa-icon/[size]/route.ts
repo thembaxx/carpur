@@ -5,7 +5,7 @@ export const dynamic = "force-static";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return [{ size: "192" }, { size: "512" }];
+  return [{ size: "192" }, { size: "512" }, { size: "maskable-512" }];
 }
 
 // Matches public/favicon.svg, preserving the existing Carpur mark.
@@ -24,11 +24,24 @@ const carpurSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
 
 export async function GET(_request: Request, context: { params: Promise<{ size: string }> }) {
   const { size } = await context.params;
-  if (size !== "192" && size !== "512") return new Response("Not found", { status: 404 });
-  const px = Number(size);
+  const maskable = size === "maskable-512";
+  if (size !== "192" && size !== "512" && !maskable) return new Response("Not found", { status: 404 });
+  const px = maskable ? 512 : Number(size);
   const src = `data:image/svg+xml;base64,${Buffer.from(carpurSvg).toString("base64")}`;
-  return new ImageResponse(createElement("img", { src, width: px, height: px }), {
-    width: px,
-    height: px,
-  });
+  return new ImageResponse(
+    createElement(
+      "div",
+      {
+        style: {
+          display: "flex", alignItems: "center", justifyContent: "center",
+          width: "100%", height: "100%", background: "#11161b",
+        },
+      },
+      createElement("img", {
+        src, width: maskable ? Math.round(px * 0.7) : px,
+        height: maskable ? Math.round(px * 0.7) : px,
+      }),
+    ),
+    { width: px, height: px },
+  );
 }
