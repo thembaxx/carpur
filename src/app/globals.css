@@ -401,3 +401,29 @@ footer .fc {
   height: 30px;
   border-radius: 8px;
 }
+
+
+/* Touch-first navigation and visible focus, adapted from mobile motion references. */
+nav {
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+}
+nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  scroll-snap-align: start;
+}
+:where(nav a, .btn, .chip, .sw):focus-visible {
+  outline: 3px solid var(--ac);
+  outline-offset: 3px;
+}
+@media (max-width: 600px) {
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea) {
+    font-size: 16px;
+  }
+  .ctl .chip {
+    min-height: 40px;
+    touch-action: manipulation;
+  }
+}
