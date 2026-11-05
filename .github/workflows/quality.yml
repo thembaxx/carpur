@@ -29,3 +29,14 @@ jobs:
       - run: node --experimental-strip-types scripts/check-navigation.mjs
       - run: node scripts/check-catalogue-freshness.mjs
       - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: Test actual keyboard navigation and responsive routes
+        shell: bash
+        run: |
+          npm run start > "$RUNNER_TEMP/carpur-nav.log" 2>&1 &
+          for i in $(seq 1 40); do
+            if curl --silent --fail http://127.0.0.1:3000 >/dev/null; then break; fi
+            sleep 2
+          done
+          curl --fail --silent http://127.0.0.1:3000 >/dev/null
+          npm run check:shell
