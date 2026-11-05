@@ -10,7 +10,7 @@ function checkRoute(href) {
   const file = pathname === "/" ? "src/app/page.tsx" : "src/app" + pathname + "/page.tsx";
   assert.ok(existsSync(join(root, file)), "Navigation points to a missing page: " + href);
 }
-const routes = [...NAV.map(([href]) => href)];
+const routes = NAV.map(([href]) => href);
 const header = readFileSync(join(root, "src/components/Header.tsx"), "utf8");
 for (const [, href] of header.matchAll(/href="(\/[a-z0-9-]+)"/g)) routes.push(href);
 for (const href of routes) checkRoute(href);
