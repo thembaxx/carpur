@@ -26,5 +26,6 @@ jobs:
       - run: npm run lint
       - run: npm run format:check
       - run: npm run typecheck
+      - run: node --experimental-strip-types scripts/check-navigation.mjs
       - run: node scripts/check-catalogue-freshness.mjs
       - run: npm run build
