@@ -31,7 +31,9 @@ function Navigation() {
 export function Header({ withActiveRoute = false }: { withActiveRoute?: boolean }) {
   return (
     <header>
-      <a className="skip-to-content" href="#m">Skip to content</a>
+      <a className="skip-to-content" href="#m">
+        Skip to content
+      </a>
       <Link className="logo" href="/">
         <Image
           src="/favicon.svg"
