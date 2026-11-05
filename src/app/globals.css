@@ -402,7 +402,6 @@ footer .fc {
   border-radius: 8px;
 }
 
-
 /* Touch-first navigation and visible focus, adapted from mobile motion references. */
 nav {
   overscroll-behavior-x: contain;
