@@ -85,7 +85,6 @@ try {
     ["/affordability?id=starlet", null],
     ["/compare", "Compare"],
     ["/compare?a=starlet", null],
-    ["/garage", "My Garage"],
     ["/vehicles/catalogue-toyota-1611", null],
   ];
   for (const [route, label] of routes) {
@@ -95,6 +94,11 @@ try {
       return expected === null ? active.length === 0 : active.length === 1 && active[0].textContent === expected;
     }, label);
   }
+  for (const href of ["/marketplace", "/marketplace?inventory=sellers&condition=USED", "/affordability", "/compare"]) {
+    const response = await page.request.get(new URL(href, APP).toString());
+    assert.equal(response.status(), 200, "Header destination must exist: " + href);
+  }
+  console.log("PASS each visible navigation destination returns HTTP 200");
   console.log("PASS exact pathname/query navigation highlights, including reordered query parameters");
 
   await page.goto(APP, { waitUntil: "domcontentloaded" });
@@ -111,7 +115,7 @@ try {
     assert.match(dimensions.font, /Sora/);
     assert.match(dimensions.viewport, /viewport-fit=cover/);
   }
-  for (const label of ["Carpur.", "New Cars", "Used Cars", "Affordability", "Compare", "My Garage", "Sign in", "Sell"]) {
+  for (const label of ["Skip to content", "Carpur.", "New Cars", "Used Cars", "Affordability", "Compare", "Check my budget"]) {
     await page.keyboard.press("Tab");
     assert.equal(await page.locator(":focus").textContent(), label);
     assert.ok(await page.locator(":focus").evaluate((element) => element.matches(":focus-visible")));

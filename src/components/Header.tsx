@@ -11,7 +11,7 @@ function Navigation() {
   const query = useSearchParams().toString();
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [pathname, query]);
+  }, [pathname]);
   return NAV.map(([href, label]) => {
     const active = isActiveRoute(pathname, query, href);
     return (
@@ -31,6 +31,9 @@ function Navigation() {
 export function Header({ withActiveRoute = false }: { withActiveRoute?: boolean }) {
   return (
     <header>
+      <a className="skip-to-content" href="#m">
+        Skip to content
+      </a>
       <Link className="logo" href="/">
         <Image
           src="/favicon.svg"
@@ -56,11 +59,8 @@ export function Header({ withActiveRoute = false }: { withActiveRoute?: boolean 
           ))
         )}
       </nav>
-      <Link className="btn o" href="/sign-in" prefetch={false}>
-        Sign in
-      </Link>
-      <Link className="btn ac" href="/sell" prefetch={false}>
-        Sell
+      <Link className="btn ac header-action" href="/affordability">
+        Check my budget
       </Link>
     </header>
   );
