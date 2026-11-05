@@ -3,7 +3,6 @@ export const NAV = [
   ["/marketplace?inventory=sellers&condition=USED", "Used Cars"],
   ["/affordability", "Affordability"],
   ["/compare", "Compare"],
-  ["/garage", "My Garage"],
 ] as const;
 
 // Query order is irrelevant; additional filters or selections remove the highlight.
