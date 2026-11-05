@@ -146,6 +146,16 @@ try {
   await page.locator('.stage [data-v="Front"]').focus(); await page.keyboard.press("Space"); await settleStudio(page);
   assert.equal(await page.locator('.stage [data-v="Front"]').getAttribute("aria-pressed"), "true");
   pass("ResizeObserver adapts automatic quality to mobile, while touch pan-y and keyboard controls work");
+  const orbitCanvas = page.locator(".stage canvas");
+  assert.equal(await orbitCanvas.getAttribute("tabindex"), "0");
+  await orbitCanvas.focus();
+  const beforeKeyboardOrbit = await image(page, "keyboard-orbit-before");
+  await page.keyboard.press("ArrowRight"); await settleStudio(page);
+  assert.equal(await page.locator('.stage [data-v="Front"]').getAttribute("aria-pressed"), "false");
+  assert.ok(difference(beforeKeyboardOrbit, await image(page, "keyboard-orbit-after")) > 1000);
+  await page.keyboard.press("Home"); await settleStudio(page);
+  assert.equal(await page.locator('.stage [data-v="3/4"]').getAttribute("aria-pressed"), "true");
+  pass("Focusable 3D canvas rotates with arrow keys and restores the three-quarter camera with Home");
 
   await page.evaluate(() => window.history.pushState(null, "", "/studio?viewer=0"));
   await page.waitForFunction(() => !document.querySelector(".stage"), undefined, { polling: 50 });

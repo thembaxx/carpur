@@ -224,6 +224,7 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
       autoQualityMedia.removeEventListener("change", onAutoQualityChange);
     if (pageVisibilityListener)
       document.removeEventListener("visibilitychange", pageVisibilityListener);
+    canvas.onkeydown = null;
     canvas.onpointerdown =
       canvas.onpointermove =
       canvas.onpointerup =
@@ -427,6 +428,29 @@ export function createStudio(el: HTMLElement, o: StudioOptions): () => void {
     };
 
     const cv = r.domElement;
+    // The same camera controls must work without a mouse or precision touch.
+    cv.tabIndex = 0;
+    cv.setAttribute(
+      "aria-label",
+      "Interactive 3D car. Use arrow keys to rotate and Home to reset the camera.",
+    );
+    cv.onkeydown = (ev) => {
+      if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home"].includes(ev.key)) return;
+      ev.preventDefault();
+      auto = false;
+      if (ev.key === "Home") {
+        tz = V["3/4"][0];
+        te = V["3/4"][1];
+        preset = "3/4";
+      } else {
+        preset = undefined;
+        if (ev.key === "ArrowLeft") tz -= 0.16;
+        if (ev.key === "ArrowRight") tz += 0.16;
+        if (ev.key === "ArrowUp") te = Math.min(0.6, te + 0.08);
+        if (ev.key === "ArrowDown") te = Math.max(0.02, te - 0.08);
+      }
+      syncControls();
+    };
     cv.onpointerdown = (ev) => {
       drag = true;
       preset = undefined;
